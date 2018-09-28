@@ -11,7 +11,12 @@ public class CompetitionAutonomous extends PositionAwareAutononomous {
     public void runOpMode() {
         super.runOpMode();
 
-        /* Do robot stuff here. */
-        /* Use this.getPosition() to determine your position on the field. */
+        waitForStart();
+        while(opModeIsActive()){
+            /* Do robot stuff here. */
+            /* Use this.getPosition() to determine your position on the field. */
+            this.addPositionToTelemetry();
+            telemetry.update();
+        }
     }
 }

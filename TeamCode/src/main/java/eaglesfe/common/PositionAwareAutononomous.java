@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.robot.Robot;
 
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 
 //   |----------------|
@@ -19,7 +20,8 @@ public abstract class PositionAwareAutononomous extends LinearOpMode {
     // Make sure you call super.runOpMode() in your derived class.
     @Override
     public void runOpMode() {
-        positionEstimator = new RoverRuckusRobotPositionEstimator();
+        int offset = (int)(9 * VuforiaBase.MM_PER_INCH);
+        positionEstimator = new RoverRuckusRobotPositionEstimator(offset, 0,0);
         positionEstimator.initialize(hardwareMap, CameraDirection.BACK, true);
         positionEstimator.start();
     }
@@ -28,7 +30,7 @@ public abstract class PositionAwareAutononomous extends LinearOpMode {
         return positionEstimator.getCurrentOrLastKnownPosition();
     }
 
-    public void addPositionToTelemetry(){
+    protected final void addPositionToTelemetry(){
         RobotPosition position = getPosition();
         position.addToTelemetry(telemetry, false);
     }
