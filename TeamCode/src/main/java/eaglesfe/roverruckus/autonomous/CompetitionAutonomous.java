@@ -1,6 +1,5 @@
 package eaglesfe.roverruckus.autonomous;
 import eaglesfe.common.PositionAwareAutononomous;
-import eaglesfe.common.RobotPosition;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -15,6 +14,7 @@ public class CompetitionAutonomous extends PositionAwareAutononomous {
         while(opModeIsActive()){
             /* Do robot stuff here. */
             /* Use this.getPosition() to determine your position on the field. */
+
             this.addPositionToTelemetry();
             telemetry.update();
         }

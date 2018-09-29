@@ -1,11 +1,8 @@
 package eaglesfe.common;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.robot.Robot;
 
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
+import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
 //   |----------------|
 // B |       X+       | R
@@ -17,12 +14,33 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 public abstract class PositionAwareAutononomous extends LinearOpMode {
     private RoverRuckusRobotPositionEstimator positionEstimator;
 
+    /**
+     * Gets whether the back-facing camera of the Robot Controller (false) or if
+     * a connected UVC webcam should be used for tracking (true).
+     */
+    protected boolean shouldUseWebcam() {
+        return true;
+    }
+    /**
+     * Sets whether to display a preview of the camera image on the Robot Controller.
+     */
+    protected boolean shouldShowCameraPreview(){
+        return true;
+    }
+
+    /**
+     * Sets the XYZ position of the tracking camera relative to the center point of the bottom of the robot.
+     */
+    protected Geometry.Point3 getCameraPositionOnRobot() {
+        return new Geometry.Point3(0,0,0);
+    }
+
     // Make sure you call super.runOpMode() in your derived class.
     @Override
     public void runOpMode() {
-        int offset = (int)(9 * VuforiaBase.MM_PER_INCH);
-        positionEstimator = new RoverRuckusRobotPositionEstimator(offset, 0,0);
-        positionEstimator.initialize(hardwareMap, CameraDirection.BACK, true);
+        Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
+        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z);
+        positionEstimator.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
         positionEstimator.start();
     }
 
@@ -30,6 +48,9 @@ public abstract class PositionAwareAutononomous extends LinearOpMode {
         return positionEstimator.getCurrentOrLastKnownPosition();
     }
 
+    /**
+     * Adds the current XYZ and PRH information to the telemetry. Does not call telemetry.update().
+     */
     protected final void addPositionToTelemetry(){
         RobotPosition position = getPosition();
         position.addToTelemetry(telemetry, false);
