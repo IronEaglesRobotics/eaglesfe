@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 // E |       X-       |
 //   |________________|
 
-public abstract class PositionAwareAutononomous extends LinearOpMode {
+public abstract class PositionAwareAutonomous extends LinearOpMode {
     private RoverRuckusRobotPositionEstimator positionEstimator;
 
     /**
