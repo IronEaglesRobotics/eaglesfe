@@ -1,6 +1,6 @@
 package eaglesfe.common;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
@@ -11,10 +11,8 @@ import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 // E |       X-       |
 //   |________________|
 
-public abstract class PositionAwareTeleOp extends OpMode {
-
+public abstract class PositionAwareAutonomous extends LinearOpMode {
     private RoverRuckusRobotPositionEstimator positionEstimator;
-    protected RobotPosition position = RobotPosition.UNKNOWN;
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if
@@ -37,25 +35,24 @@ public abstract class PositionAwareTeleOp extends OpMode {
         return new Geometry.Point3(0,0,0);
     }
 
-    // Make sure you call super.init() in your derived class.
+    // Make sure you call super.runOpMode() in your derived class.
     @Override
-    public void init() {
+    public void runOpMode() {
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
         positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z);
-        positionEstimator.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
+        positionEstimator.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
         positionEstimator.start();
     }
 
-    // Make sure you call super.loop() in your derived class.
-    @Override
-    public void loop() {
-        position = positionEstimator.getCurrentOrLastKnownPosition();
+    protected RobotPosition getPosition(){
+        return positionEstimator.getCurrentOrLastKnownPosition();
     }
 
     /**
      * Adds the current XYZ and PRH information to the telemetry. Does not call telemetry.update().
      */
-    public void addPositionToTelemetry(){
+    protected final void addPositionToTelemetry(){
+        RobotPosition position = getPosition();
         position.addToTelemetry(telemetry, false);
     }
 }

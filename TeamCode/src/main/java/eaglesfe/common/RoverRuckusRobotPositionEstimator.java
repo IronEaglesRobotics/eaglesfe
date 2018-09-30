@@ -3,6 +3,7 @@ package eaglesfe.common;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -28,22 +29,21 @@ public class RoverRuckusRobotPositionEstimator
     private boolean isInitialized;
     OpenGLMatrix lastLocation;
 
-    private int cameraForwardOffset;
-    private int cameraVerticalOffset;
-    private int cameraLeftOffset;
+    private int cameraForwardOffsetMm;
+    private int cameraVerticalOffsetMm;
+    private int cameraLeftOffsetMm;
 
     RoverRuckusRobotPositionEstimator() {
         this(0,0,0);
     }
 
-    RoverRuckusRobotPositionEstimator(int cameraForwardOffset, int cameraLeftOffset, int cameraVerticalOffset) {
-        this.cameraForwardOffset = cameraForwardOffset;
-        this.cameraVerticalOffset = cameraVerticalOffset;
-        this.cameraLeftOffset = cameraLeftOffset;
+    RoverRuckusRobotPositionEstimator(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset) {
+        this.cameraForwardOffsetMm = (int)(cameraForwardOffset * VuforiaBase.MM_PER_INCH);
+        this.cameraVerticalOffsetMm = (int)(cameraVerticalOffset * VuforiaBase.MM_PER_INCH);
+        this.cameraLeftOffsetMm = (int)(cameraLeftOffset * VuforiaBase.MM_PER_INCH);
     }
 
-    public void initialize(HardwareMap hardwareMap, VuforiaLocalizer.CameraDirection camera, boolean preview){
-
+    public void initialize(HardwareMap hardwareMap, boolean useWebcam, boolean preview){
         VuforiaLocalizer.Parameters parameters;
 
         if (preview){
@@ -55,7 +55,12 @@ public class RoverRuckusRobotPositionEstimator
         }
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY ;
-        parameters.cameraDirection   = camera;
+        if (useWebcam){
+            parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam");
+        }
+        else {
+            parameters.cameraDirection  = CameraDirection.BACK;
+        }
 
         //  Instantiate the Vuforia engine
         VuforiaLocalizer vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -67,28 +72,28 @@ public class RoverRuckusRobotPositionEstimator
         VuforiaTrackable blueRover = targetsRoverRuckus.get(0);
         blueRover.setName("Blue-Rover");
         OpenGLMatrix blueRoverLocationOnField = OpenGLMatrix
-                .translation(0, VuforiaBase.MM_FTC_FIELD_WIDTH, mmTargetHeight)
+                .translation(0, VuforiaBase.MM_FTC_FIELD_WIDTH / 2, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0, 0));
         blueRover.setLocation(blueRoverLocationOnField);
 
         VuforiaTrackable redFootprint = targetsRoverRuckus.get(1);
         redFootprint.setName("Red-Footprint");
         OpenGLMatrix redFootprintLocationOnField = OpenGLMatrix
-                .translation(0, -VuforiaBase.MM_FTC_FIELD_WIDTH, mmTargetHeight)
+                .translation(0, -VuforiaBase.MM_FTC_FIELD_WIDTH / 2, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0, 180));
         redFootprint.setLocation(redFootprintLocationOnField);
 
         VuforiaTrackable frontCraters = targetsRoverRuckus.get(2);
         frontCraters.setName("Front-Craters");
         OpenGLMatrix frontCratersLocationOnField = OpenGLMatrix
-                .translation(-VuforiaBase.MM_FTC_FIELD_WIDTH, 0, mmTargetHeight)
+                .translation(-VuforiaBase.MM_FTC_FIELD_WIDTH / 2, 0, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0 , 90));
         frontCraters.setLocation(frontCratersLocationOnField);
 
         VuforiaTrackable backSpace = targetsRoverRuckus.get(3);
         backSpace.setName("Back-Space");
         OpenGLMatrix backSpaceLocationOnField = OpenGLMatrix
-                .translation(VuforiaBase.MM_FTC_FIELD_WIDTH, 0, mmTargetHeight)
+                .translation(VuforiaBase.MM_FTC_FIELD_WIDTH / 2, 0, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0, -90));
         backSpace.setLocation(backSpaceLocationOnField);
 
@@ -97,9 +102,9 @@ public class RoverRuckusRobotPositionEstimator
         trackables.addAll(targetsRoverRuckus);
 
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(cameraForwardOffset, cameraLeftOffset, cameraVerticalOffset)
+                .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES,
-                        camera == CameraDirection.FRONT ? 90 : -90, 0, 0));
+                        -90, 0, 0));
 
         for (VuforiaTrackable trackable : trackables)
         {
@@ -131,7 +136,11 @@ public class RoverRuckusRobotPositionEstimator
 
     public RobotPosition getCurrentOrLastKnownPosition() throws IllegalStateException {
         RobotPosition currentPosition = getCurrentPosition();
-        return currentPosition.isKnown() ? currentPosition : new RobotPosition(lastLocation);
+        if (currentPosition.isKnown()){
+            return currentPosition;
+        }
+
+        return lastLocation != null ? new RobotPosition(lastLocation) : RobotPosition.UNKNOWN;
     }
 
     public RobotPosition getCurrentPosition() throws IllegalStateException {
