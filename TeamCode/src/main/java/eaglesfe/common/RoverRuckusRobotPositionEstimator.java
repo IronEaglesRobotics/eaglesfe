@@ -56,7 +56,7 @@ public class RoverRuckusRobotPositionEstimator
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY ;
         if (useWebcam){
-            parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam");
+            parameters.cameraName = hardwareMap.getAll(WebcamName.class).get(0);
         }
         else {
             parameters.cameraDirection  = CameraDirection.BACK;
@@ -97,18 +97,28 @@ public class RoverRuckusRobotPositionEstimator
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0, -90));
         backSpace.setLocation(backSpaceLocationOnField);
 
-        // For convenience, gather together all the trackable objects in one easily-iterable collection */
         trackables = new ArrayList<>();
         trackables.addAll(targetsRoverRuckus);
 
-        OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
-                .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES,
-                        -90, 0, 0));
+        if (useWebcam){
+            OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
+                    .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
+                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XZY, AngleUnit.DEGREES, 90, 90, 0));
 
-        for (VuforiaTrackable trackable : trackables)
-        {
-            ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+            for (VuforiaTrackable trackable : trackables)
+            {
+                ((VuforiaTrackableDefaultListener)trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
+            }
+        }
+        else {
+            OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
+                    .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
+                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES, -90, 0, 0));
+
+            for (VuforiaTrackable trackable : trackables)
+            {
+                ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+            }
         }
 
         isInitialized = true;

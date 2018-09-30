@@ -28,13 +28,13 @@ public class RobotPosition {
         this(matrix.getTranslation(), Orientation.getOrientation(matrix, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
     }
 
-    RobotPosition(VectorF translation, Orientation rotation){
+    private RobotPosition(VectorF translation, Orientation rotation){
         this.x = translation.get(0) / VuforiaBase.MM_PER_INCH;
         this.y = translation.get(1) / VuforiaBase.MM_PER_INCH;
         this.z = translation.get(2) / VuforiaBase.MM_PER_INCH;
 
-        this.roll = rotation.firstAngle;
-        this.pitch = rotation.secondAngle;
+        this.roll = rotation.firstAngle * -1;
+        this.pitch = rotation.secondAngle * -1;
         this.heading = rotation.thirdAngle;
     }
 
@@ -44,20 +44,23 @@ public class RobotPosition {
 
     public void addToTelemetry(Telemetry telemetry, boolean immediateUpdate){
         boolean isKnown = isKnown();
-        String positionFormatter = isKnown ? "{X, Y, Z} = %.1f, %.1f, %.1f" : "Unknown";
-        String rotationFormatter = isKnown ? "{R, P, H} = %.0f, %.0f, %.0f" : "Unknown";
-        telemetry.addData("Pos (in)", positionFormatter, x, y, z);
-        telemetry.addData("Rot (deg)", rotationFormatter, roll, pitch, heading);
+        String positionFormatter = isKnown ? "X: %-10.1f Y: %-10.1f Z: %-10.1f" : "Unknown";
+        String rotationFormatter = isKnown ? "R: %-10.1f P: %-10.1f H: %-10.1f" : "Unknown";
+        telemetry.addData("", positionFormatter, x, y, z);
+        telemetry.addData("", rotationFormatter, roll, pitch, heading);
 
         if (immediateUpdate){
             telemetry.update();
         }
     }
 
+    /* To help in constructing a mental model, these four properties are relative to the FIELD's coordinate system... */
     public float x;
     public float y;
     public float z;
+    public float heading;
+
+    /* ... and these two properties are relative to the ROBOT's coordinate system */
     public float pitch;
     public float roll;
-    public float heading;
 }
