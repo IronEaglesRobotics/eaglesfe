@@ -32,15 +32,17 @@ public class RoverRuckusRobotPositionEstimator
     private int cameraForwardOffsetMm;
     private int cameraVerticalOffsetMm;
     private int cameraLeftOffsetMm;
+    private int cameraAngleOffsetDeg;
 
     RoverRuckusRobotPositionEstimator() {
-        this(0,0,0);
+        this(0,0,0, 90);
     }
 
-    RoverRuckusRobotPositionEstimator(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset) {
+    RoverRuckusRobotPositionEstimator(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset, int cameraAngle) {
         this.cameraForwardOffsetMm = (int)(cameraForwardOffset * VuforiaBase.MM_PER_INCH);
         this.cameraVerticalOffsetMm = (int)(cameraVerticalOffset * VuforiaBase.MM_PER_INCH);
         this.cameraLeftOffsetMm = (int)(cameraLeftOffset * VuforiaBase.MM_PER_INCH);
+        this.cameraAngleOffsetDeg = cameraAngle;
     }
 
     public void initialize(HardwareMap hardwareMap, boolean useWebcam, boolean preview){
@@ -103,7 +105,7 @@ public class RoverRuckusRobotPositionEstimator
         if (useWebcam){
             OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
                     .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
-                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XZY, AngleUnit.DEGREES, 90, 90, 0));
+                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XZY, AngleUnit.DEGREES, 90, cameraAngleOffsetDeg, 0));
 
             for (VuforiaTrackable trackable : trackables)
             {
@@ -113,7 +115,7 @@ public class RoverRuckusRobotPositionEstimator
         else {
             OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                     .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
-                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES, -90, 0, 0));
+                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES, -90, cameraAngleOffsetDeg - 90, 0));
 
             for (VuforiaTrackable trackable : trackables)
             {

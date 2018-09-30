@@ -37,11 +37,16 @@ public abstract class PositionAwareTeleOp extends OpMode {
         return new Geometry.Point3(0,0,0);
     }
 
+    /**
+     * Sets the Z angle of the tracking camera. 0 degrees = RIGHT, 90 = FORWARD, etc.
+     */
+    protected int getCameraAngle() { return 90; }
+
     // Make sure you call super.init() in your derived class.
     @Override
     public void init() {
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
-        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z);
+        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
         positionEstimator.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
         positionEstimator.start();
     }
