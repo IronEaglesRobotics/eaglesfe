@@ -15,7 +15,7 @@
 
 ## Getting Help
 
-**ALWAYS FEEL FREE TO CONTACT A MENTOR FOR HELP WITH ANY AND ALL PROGRAMMING QUESTIONS. THAT'S WHAT WE'RE HERE FOR. **
+**ALWAYS FEEL FREE TO CONTACT A MENTOR FOR HELP WITH ANY AND ALL PROGRAMMING QUESTIONS. THAT'S WHAT WE'RE HERE FOR.**
 
 You can contact us via email or through github - whichever you prefer. Or in person, of course. No question is dumb! Ask lots and lots of questions and you'll get good *really, really* fast!
 
