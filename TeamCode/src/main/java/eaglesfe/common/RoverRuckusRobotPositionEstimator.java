@@ -32,15 +32,17 @@ public class RoverRuckusRobotPositionEstimator
     private int cameraForwardOffsetMm;
     private int cameraVerticalOffsetMm;
     private int cameraLeftOffsetMm;
+    private int cameraAngleOffsetDeg;
 
     RoverRuckusRobotPositionEstimator() {
-        this(0,0,0);
+        this(0,0,0, 90);
     }
 
-    RoverRuckusRobotPositionEstimator(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset) {
+    RoverRuckusRobotPositionEstimator(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset, int cameraAngle) {
         this.cameraForwardOffsetMm = (int)(cameraForwardOffset * VuforiaBase.MM_PER_INCH);
         this.cameraVerticalOffsetMm = (int)(cameraVerticalOffset * VuforiaBase.MM_PER_INCH);
         this.cameraLeftOffsetMm = (int)(cameraLeftOffset * VuforiaBase.MM_PER_INCH);
+        this.cameraAngleOffsetDeg = cameraAngle;
     }
 
     public void initialize(HardwareMap hardwareMap, boolean useWebcam, boolean preview){
@@ -56,7 +58,7 @@ public class RoverRuckusRobotPositionEstimator
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY ;
         if (useWebcam){
-            parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam");
+            parameters.cameraName = hardwareMap.getAll(WebcamName.class).get(0);
         }
         else {
             parameters.cameraDirection  = CameraDirection.BACK;
@@ -97,18 +99,28 @@ public class RoverRuckusRobotPositionEstimator
                 .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0, -90));
         backSpace.setLocation(backSpaceLocationOnField);
 
-        // For convenience, gather together all the trackable objects in one easily-iterable collection */
         trackables = new ArrayList<>();
         trackables.addAll(targetsRoverRuckus);
 
-        OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
-                .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES,
-                        -90, 0, 0));
+        if (useWebcam){
+            OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
+                    .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
+                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XZY, AngleUnit.DEGREES, 90, cameraAngleOffsetDeg, 0));
 
-        for (VuforiaTrackable trackable : trackables)
-        {
-            ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+            for (VuforiaTrackable trackable : trackables)
+            {
+                ((VuforiaTrackableDefaultListener)trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
+            }
+        }
+        else {
+            OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
+                    .translation(cameraForwardOffsetMm, cameraLeftOffsetMm, cameraVerticalOffsetMm)
+                    .multiplied(Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES, -90, cameraAngleOffsetDeg - 90, 0));
+
+            for (VuforiaTrackable trackable : trackables)
+            {
+                ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+            }
         }
 
         isInitialized = true;
