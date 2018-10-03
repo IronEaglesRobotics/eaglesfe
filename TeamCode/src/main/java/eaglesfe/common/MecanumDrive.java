@@ -14,6 +14,11 @@ public class MecanumDrive {
         this.frontRight = frontRight;
         this.backLeft = backLeft;
         this.backRight = backRight;
+
+        this.frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void updateMotors(double x, double y, double z){
