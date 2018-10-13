@@ -18,4 +18,11 @@ public class EncoderBasedRobotPosition {
     public void put(String motorName, Integer encoderValue) {
         encoderPositions.put(motorName, encoderValue);
     }
+
+    @Override
+    public String toString() {
+        return "EncoderBasedRobotPosition{" +
+                "encoderPositions=" + encoderPositions.toString() +
+                '}';
+    }
 }

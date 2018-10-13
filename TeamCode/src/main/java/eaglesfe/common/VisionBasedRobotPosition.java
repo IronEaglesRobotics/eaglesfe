@@ -1,5 +1,7 @@
 package eaglesfe.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -27,13 +29,22 @@ public class VisionBasedRobotPosition {
     public float pitch;
     public float roll;
 
-    protected VisionBasedRobotPosition(){
+    public VisionBasedRobotPosition(){
         this.x = NaN;
         this.y = NaN;
         this.z = NaN;
         this.roll = NaN;
         this.pitch = NaN;
         this.heading = NaN;
+    }
+
+    public void setAllValues(float x, float y, float z, float heading, float pitch, float roll) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.heading = heading;
+        this.pitch = pitch;
+        this.roll = roll;
     }
 
     VisionBasedRobotPosition(OpenGLMatrix matrix) {
@@ -50,6 +61,7 @@ public class VisionBasedRobotPosition {
         this.heading = rotation.thirdAngle;
     }
 
+    @JsonIgnore
     public boolean isKnown (){
         return this != UNKNOWN;
     }
@@ -66,4 +78,15 @@ public class VisionBasedRobotPosition {
         }
     }
 
+    @Override
+    public String toString() {
+        return "VisionBasedRobotPosition{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", heading=" + heading +
+                ", pitch=" + pitch +
+                ", roll=" + roll +
+                '}';
+    }
 }

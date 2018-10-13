@@ -40,8 +40,5 @@ public class JsonPojoTestTest {
         System.out.println(positionsMap.toString());
     }*/
 
-    @Test
-    public void writeKeyFrames() {
 
-    }
 }

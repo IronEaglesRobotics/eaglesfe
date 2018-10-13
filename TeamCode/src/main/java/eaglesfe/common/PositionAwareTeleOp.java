@@ -26,7 +26,8 @@ public abstract class PositionAwareTeleOp extends OpMode {
     private VisionBasedRobotPosition position = VisionBasedRobotPosition.UNKNOWN;
     private EncoderBasedRobotPosition encoderBasedRobotPosition;
     private SensorBasedRobotPosition sensorBasedRobotPosition;
-    private KeyFrames keyFrames = new KeyFrames(this);
+    private KeyFrames keyFrames = new KeyFrames();
+    private boolean isFlightRecorder = false;
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if
@@ -54,6 +55,14 @@ public abstract class PositionAwareTeleOp extends OpMode {
      */
     protected int getCameraAngle() { return 90; }
 
+    public boolean isFlightRecorder() {
+        return isFlightRecorder;
+    }
+
+    public void setFlightRecorder(boolean flightRecorder) {
+        isFlightRecorder = flightRecorder;
+    }
+
     // Make sure you call super.init() in your derived class.
     @Override
     public void init() {
@@ -78,8 +87,18 @@ public abstract class PositionAwareTeleOp extends OpMode {
         position = positionEstimator.getCurrentOrLastKnownPosition();
         encoderBasedRobotPosition = encoderPositionRecorder.getEncoderPositions();
         sensorBasedRobotPosition = sensorValueRecorder.getSensorValues();
-        if (gamepad1.x) {
-            keyFrames.addKeyFrame(new RobotSnapshot(position, encoderBasedRobotPosition, sensorBasedRobotPosition));
+
+        /*
+        Hit the a button to save a frame. Hit the y button to finalize the program.
+         */
+        if (isFlightRecorder && gamepad1.a) {
+            RobotSnapshot robotSnapshot = new RobotSnapshot(position, encoderBasedRobotPosition, sensorBasedRobotPosition);
+            this.telemetry.addData("Writing keyframe: ", robotSnapshot.toString());
+            keyFrames.addKeyFrame(robotSnapshot);
+        }
+        if (isFlightRecorder && gamepad1.y) {
+            this.telemetry.addLine("Finalizing flight to file");
+            keyFrames.keyFramesToFile(this);
         }
     }
 
