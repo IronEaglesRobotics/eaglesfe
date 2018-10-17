@@ -29,7 +29,7 @@ public class MecanumDrive {
         blPower = x - y + z;
         brPower = x + y - z;
 
-        double max = Math.max(flPower, Math.max(frPower, Math.max(blPower, brPower)));
+        double max = Math.max(1, Math.max(flPower, Math.max(frPower, Math.max(blPower, brPower))));
 
         flPower /= max;
         frPower /= max;
