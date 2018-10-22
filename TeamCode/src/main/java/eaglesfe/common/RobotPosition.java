@@ -1,5 +1,7 @@
 package eaglesfe.common;
 
+import android.util.Log;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -8,12 +10,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Console;
 
 import static java.lang.Float.NaN;
 
 public class RobotPosition {
 
     public static final RobotPosition UNKNOWN = new RobotPosition();
+
+    public RobotPosition(float x, float y, float z, float roll, float pitch, float heading){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.roll = roll;
+        this.pitch = pitch;
+        this.heading = heading;
+    }
 
     protected RobotPosition(){
         this.x = NaN;
@@ -52,6 +67,27 @@ public class RobotPosition {
         if (immediateUpdate){
             telemetry.update();
         }
+    }
+
+    public void addToBirdseye(BirdseyeServer birdseyeServer){
+        JSONObject obj = asJSONObject();
+        birdseyeServer.broadcast(obj);
+    }
+
+    public JSONObject asJSONObject() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("x", x);
+            obj.put("y", y);
+            obj.put("z", z);
+            obj.put("pitch", pitch);
+            obj.put("roll", roll);
+            obj.put("heading", heading);
+        } catch (JSONException e){
+            Log.e("ROBOT_POSITION", e.getMessage());
+        }
+        Log.i("ROBOT_POSITION", obj.toString());
+        return obj;
     }
 
     /* To help in constructing a mental model, these four properties are relative to the FIELD's coordinate system... */

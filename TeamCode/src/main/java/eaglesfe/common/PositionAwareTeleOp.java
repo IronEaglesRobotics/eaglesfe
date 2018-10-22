@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
+import java.net.UnknownHostException;
+
 //   |----------------|
 // B |       X+       | R
 // L |                | E
@@ -41,6 +43,7 @@ public abstract class PositionAwareTeleOp extends OpMode {
      * Sets the Z angle of the tracking camera. 0 degrees = RIGHT, 90 = FORWARD, etc.
      */
     protected int getCameraAngle() { return 90; }
+
 
     // Make sure you call super.init() in your derived class.
     @Override
