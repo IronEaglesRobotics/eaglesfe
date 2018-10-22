@@ -71,7 +71,7 @@ public class KeyFramesTest {
         System.out.println(keyFrames.toString());
 
         System.out.println("TmpDir: " + System.getProperty("java.io.tmpdir"));
-        File outFile = new File(System.getProperty("java.io.tmpdir") + File.pathSeparator + "writeKeyFramesTest.json");
+        File outFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "writeKeyFramesTest.json");
         keyFrames.keyFramesToFile(outFile);
 
         KeyFrames keyFramesFromFile = KeyFrames.keyFramesFileToObject(outFile);
