@@ -49,7 +49,7 @@ public abstract class PositionAwareAutonomous extends LinearOpMode {
         positionEstimator.start();
     }
 
-    protected RobotPosition getPosition(){
+    protected VisionBasedRobotPosition getPosition(){
         return positionEstimator.getCurrentOrLastKnownPosition();
     }
 
@@ -57,7 +57,7 @@ public abstract class PositionAwareAutonomous extends LinearOpMode {
      * Adds the current XYZ and PRH information to the telemetry. Does not call telemetry.update().
      */
     protected final void addPositionToTelemetry(){
-        RobotPosition position = getPosition();
+        VisionBasedRobotPosition position = getPosition();
         position.addToTelemetry(telemetry, false);
     }
 }

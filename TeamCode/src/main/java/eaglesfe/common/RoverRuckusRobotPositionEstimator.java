@@ -146,16 +146,16 @@ public class RoverRuckusRobotPositionEstimator
         }
     }
 
-    public RobotPosition getCurrentOrLastKnownPosition() throws IllegalStateException {
-        RobotPosition currentPosition = getCurrentPosition();
+    public VisionBasedRobotPosition getCurrentOrLastKnownPosition() throws IllegalStateException {
+        VisionBasedRobotPosition currentPosition = getCurrentPosition();
         if (currentPosition.isKnown()){
             return currentPosition;
         }
 
-        return lastLocation != null ? new RobotPosition(lastLocation) : RobotPosition.UNKNOWN;
+        return lastLocation != null ? new VisionBasedRobotPosition(lastLocation) : VisionBasedRobotPosition.UNKNOWN;
     }
 
-    public RobotPosition getCurrentPosition() throws IllegalStateException {
+    public VisionBasedRobotPosition getCurrentPosition() throws IllegalStateException {
 
         assertInitialized();
         assertTrackingStarted();
@@ -170,11 +170,11 @@ public class RoverRuckusRobotPositionEstimator
                 OpenGLMatrix updatedRobotLocation = listener.getUpdatedRobotLocation();
                 if (updatedRobotLocation != null) {
                     lastLocation = updatedRobotLocation;
-                    return new RobotPosition(lastLocation);
+                    return new VisionBasedRobotPosition(lastLocation);
                 }
             }
         }
-        return RobotPosition.UNKNOWN;
+        return VisionBasedRobotPosition.UNKNOWN;
     }
 
     private void assertInitialized() throws IllegalStateException {

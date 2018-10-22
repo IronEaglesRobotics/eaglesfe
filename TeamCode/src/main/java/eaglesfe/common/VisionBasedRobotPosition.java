@@ -1,5 +1,7 @@
 package eaglesfe.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -9,13 +11,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
 
+import java.util.Map;
+
 import static java.lang.Float.NaN;
 
-public class RobotPosition {
+public class VisionBasedRobotPosition {
 
-    public static final RobotPosition UNKNOWN = new RobotPosition();
+    public static final VisionBasedRobotPosition UNKNOWN = new VisionBasedRobotPosition();
 
-    protected RobotPosition(){
+    /* To help in constructing a mental model, these four properties are relative to the FIELD's coordinate system... */
+    public float x;
+    public float y;
+    public float z;
+    public float heading;
+
+    /* ... and these two properties are relative to the ROBOT's coordinate system */
+    public float pitch;
+    public float roll;
+
+    public VisionBasedRobotPosition(){
         this.x = NaN;
         this.y = NaN;
         this.z = NaN;
@@ -24,11 +38,20 @@ public class RobotPosition {
         this.heading = NaN;
     }
 
-    RobotPosition(OpenGLMatrix matrix) {
+    public void setAllValues(float x, float y, float z, float heading, float pitch, float roll) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.heading = heading;
+        this.pitch = pitch;
+        this.roll = roll;
+    }
+
+    VisionBasedRobotPosition(OpenGLMatrix matrix) {
         this(matrix.getTranslation(), Orientation.getOrientation(matrix, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
     }
 
-    private RobotPosition(VectorF translation, Orientation rotation){
+    private VisionBasedRobotPosition(VectorF translation, Orientation rotation){
         this.x = translation.get(0) / VuforiaBase.MM_PER_INCH;
         this.y = translation.get(1) / VuforiaBase.MM_PER_INCH;
         this.z = translation.get(2) / VuforiaBase.MM_PER_INCH;
@@ -38,6 +61,7 @@ public class RobotPosition {
         this.heading = rotation.thirdAngle;
     }
 
+    @JsonIgnore
     public boolean isKnown (){
         return this != UNKNOWN;
     }
@@ -54,13 +78,15 @@ public class RobotPosition {
         }
     }
 
-    /* To help in constructing a mental model, these four properties are relative to the FIELD's coordinate system... */
-    public float x;
-    public float y;
-    public float z;
-    public float heading;
-
-    /* ... and these two properties are relative to the ROBOT's coordinate system */
-    public float pitch;
-    public float roll;
+    @Override
+    public String toString() {
+        return "VisionBasedRobotPosition{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", heading=" + heading +
+                ", pitch=" + pitch +
+                ", roll=" + roll +
+                '}';
+    }
 }
