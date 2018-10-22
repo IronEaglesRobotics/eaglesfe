@@ -1,7 +1,5 @@
 package eaglesfe.common;
 
-import com.qualcomm.robotcore.robot.Robot;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -46,7 +44,7 @@ public class BirdseyeServer extends WebSocketServer{
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         conn.send("BIRDSEYE VIEW ESTABLISHED");
-        postToTelemetry("CLIENT CONNECTED!");
+        postToTelemetry("BIRDSEYE VIEW ESTABLISHED!");
     }
 
     @Override

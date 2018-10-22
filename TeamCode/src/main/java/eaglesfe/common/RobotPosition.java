@@ -86,7 +86,7 @@ public class RobotPosition {
         } catch (JSONException e){
             Log.e("ROBOT_POSITION", e.getMessage());
         }
-        Log.i("ROBOT_POSITION", obj.toString());
+
         return obj;
     }
 
