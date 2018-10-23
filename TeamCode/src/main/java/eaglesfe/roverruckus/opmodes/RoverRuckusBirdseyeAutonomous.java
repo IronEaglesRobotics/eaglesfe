@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
-import eaglesfe.common.FieldPosition;
+import eaglesfe.common.VisionBasedRobotPosition;
 import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
 //   |----------------|
@@ -52,7 +52,7 @@ public abstract class RoverRuckusBirdseyeAutonomous extends LinearOpMode {
         tracker.start();
     }
 
-    protected FieldPosition getPosition(){
+    protected VisionBasedRobotPosition getPosition(){
         return tracker.getCurrentOrLastKnownPosition();
     }
 
@@ -60,7 +60,7 @@ public abstract class RoverRuckusBirdseyeAutonomous extends LinearOpMode {
      * Adds the current XYZ and PRH information to the telemetry. Does not call telemetry.update().
      */
     protected final void addPositionToTelemetry(){
-        FieldPosition position = getPosition();
+        VisionBasedRobotPosition position = getPosition();
         position.addToTelemetry(telemetry, false);
     }
 }

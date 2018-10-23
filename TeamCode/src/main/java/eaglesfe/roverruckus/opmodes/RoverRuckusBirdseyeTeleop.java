@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
-import eaglesfe.common.FieldPosition;
+import eaglesfe.common.VisionBasedRobotPosition;
 import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
 //   |----------------|
@@ -17,7 +17,7 @@ import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 public abstract class RoverRuckusBirdseyeTeleop extends OpMode {
 
     private RoverRuckusBirdseyeTracker tracker;
-    protected FieldPosition position = FieldPosition.UNKNOWN;
+    protected VisionBasedRobotPosition position = VisionBasedRobotPosition.UNKNOWN;
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if

@@ -11,14 +11,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import eaglesfe.common.BirdseyeServer;
-import eaglesfe.common.FieldPosition;
+import eaglesfe.common.VisionBasedRobotPosition;
 
 @TeleOp(name="Birdseye Test", group ="Experimental")
 public class BirdseyeTest extends OpMode {
 
     protected BirdseyeServer birdseye;
 
-    private FieldPosition debugData = new FieldPosition(0,0,0,0,0,0);
+    private VisionBasedRobotPosition debugData = new VisionBasedRobotPosition(0,0,0,0,0,0);
     private boolean debugAxisZig = true;
     private String debugAxis = "X";
 

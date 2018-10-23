@@ -15,11 +15,11 @@ import org.json.JSONObject;
 
 import static java.lang.Float.NaN;
 
-public class FieldPosition {
+public class VisionBasedRobotPosition {
 
-    public static final FieldPosition UNKNOWN = new FieldPosition();
+    public static final VisionBasedRobotPosition UNKNOWN = new VisionBasedRobotPosition();
 
-    public FieldPosition(float x, float y, float z, float roll, float pitch, float heading){
+    public VisionBasedRobotPosition(float x, float y, float z, float roll, float pitch, float heading){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -28,7 +28,7 @@ public class FieldPosition {
         this.heading = heading;
     }
 
-    protected FieldPosition(){
+    protected VisionBasedRobotPosition(){
         this.x = NaN;
         this.y = NaN;
         this.z = NaN;
@@ -37,11 +37,11 @@ public class FieldPosition {
         this.heading = NaN;
     }
 
-    public FieldPosition(OpenGLMatrix matrix) {
+    public VisionBasedRobotPosition(OpenGLMatrix matrix) {
         this(matrix.getTranslation(), Orientation.getOrientation(matrix, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
     }
 
-    private FieldPosition(VectorF translation, Orientation rotation){
+    private VisionBasedRobotPosition(VectorF translation, Orientation rotation){
         this.x = translation.get(0) / VuforiaBase.MM_PER_INCH;
         this.y = translation.get(1) / VuforiaBase.MM_PER_INCH;
         this.z = translation.get(2) / VuforiaBase.MM_PER_INCH;
