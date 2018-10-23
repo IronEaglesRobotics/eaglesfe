@@ -37,6 +37,8 @@ public class BirdseyeServer extends WebSocketServer{
         this.broadcast(telemetry.toString());
     }
 
+    public String incoming = "";
+
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         conn.send("BIRDSEYE VIEW ESTABLISHED");
@@ -50,7 +52,8 @@ public class BirdseyeServer extends WebSocketServer{
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-
+        this.incoming = message;
+        postToTelemetry(message);
     }
 
     @Override
