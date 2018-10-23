@@ -2,6 +2,8 @@ package eaglesfe.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import android.util.Log;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -10,6 +12,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -29,14 +33,8 @@ public class VisionBasedRobotPosition {
     public float pitch;
     public float roll;
 
-    public VisionBasedRobotPosition(){
-        this.x = NaN;
-        this.y = NaN;
-        this.z = NaN;
-        this.roll = NaN;
-        this.pitch = NaN;
-        this.heading = NaN;
-    }
+
+    public VisionBasedRobotPosition() {}
 
     public void setAllValues(float x, float y, float z, float heading, float pitch, float roll) {
         this.x = x;
@@ -47,7 +45,7 @@ public class VisionBasedRobotPosition {
         this.roll = roll;
     }
 
-    VisionBasedRobotPosition(OpenGLMatrix matrix) {
+    public VisionBasedRobotPosition(OpenGLMatrix matrix) {
         this(matrix.getTranslation(), Orientation.getOrientation(matrix, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
     }
 
@@ -89,4 +87,26 @@ public class VisionBasedRobotPosition {
                 ", roll=" + roll +
                 '}';
     }
+
+    public void addToBirdseye(BirdseyeServer birdseyeServer){
+        JSONObject obj = asJSONObject();
+        birdseyeServer.broadcast(obj);
+    }
+
+    public JSONObject asJSONObject() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("x", x);
+            obj.put("y", y);
+            obj.put("z", z);
+            obj.put("pitch", pitch);
+            obj.put("roll", roll);
+            obj.put("heading", heading);
+        } catch (JSONException e){
+            Log.e("ROBOT_POSITION", e.getMessage());
+        }
+
+        return obj;
+    }
+
 }

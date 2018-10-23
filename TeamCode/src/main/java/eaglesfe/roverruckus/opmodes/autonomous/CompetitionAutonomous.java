@@ -1,10 +1,10 @@
-package eaglesfe.roverruckus.autonomous;
-import eaglesfe.common.PositionAwareAutonomous;
+package eaglesfe.roverruckus.opmodes.autonomous;
+import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeAutonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name="Autonomous", group ="Competition")
-public class CompetitionAutonomous extends PositionAwareAutonomous {
+public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
 
     @Override
     public void runOpMode() {

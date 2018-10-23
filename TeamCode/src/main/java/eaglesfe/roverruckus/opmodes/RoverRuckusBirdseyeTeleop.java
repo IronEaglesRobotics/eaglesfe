@@ -1,4 +1,4 @@
-package eaglesfe.common;
+package eaglesfe.roverruckus.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -11,6 +11,9 @@ import eaglesfe.flightrecorder.RobotSnapshot;
 import eaglesfe.flightrecorder.SensorBasedRobotPosition;
 import eaglesfe.flightrecorder.SensorValueRecorder;
 
+import eaglesfe.common.VisionBasedRobotPosition;
+import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
+
 //   |----------------|
 // B |       X+       | R
 // L |                | E
@@ -18,9 +21,8 @@ import eaglesfe.flightrecorder.SensorValueRecorder;
 // E |       X-       |
 //   |________________|
 
-public abstract class PositionAwareTeleOp extends OpMode {
+public abstract class RoverRuckusBirdseyeTeleop extends OpMode {
 
-    private RoverRuckusRobotPositionEstimator positionEstimator;
     private EncoderPositionRecorder encoderPositionRecorder;
     private SensorValueRecorder sensorValueRecorder;
     private VisionBasedRobotPosition position = VisionBasedRobotPosition.UNKNOWN;
@@ -28,6 +30,10 @@ public abstract class PositionAwareTeleOp extends OpMode {
     private SensorBasedRobotPosition sensorBasedRobotPosition;
     private KeyFrames keyFrames = new KeyFrames();
     private boolean isFlightRecorder = false;
+
+    private RoverRuckusBirdseyeTracker tracker;
+    protected VisionBasedRobotPosition positionEstimator = VisionBasedRobotPosition.UNKNOWN;
+
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if
@@ -68,9 +74,9 @@ public abstract class PositionAwareTeleOp extends OpMode {
     public void init() {
         //Vuforia position data
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
-        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
-        positionEstimator.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
-        positionEstimator.start();
+        tracker = new RoverRuckusBirdseyeTracker(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
+        tracker.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
+        tracker.start();
 
         //Encoder recording
         encoderPositionRecorder = new EncoderPositionRecorder(this.hardwareMap);
@@ -84,7 +90,7 @@ public abstract class PositionAwareTeleOp extends OpMode {
     // Make sure you call super.loop() in your derived class.
     @Override
     public void loop() {
-        position = positionEstimator.getCurrentOrLastKnownPosition();
+        position = tracker.getCurrentOrLastKnownPosition();
         encoderBasedRobotPosition = encoderPositionRecorder.getEncoderPositions();
         sensorBasedRobotPosition = sensorValueRecorder.getSensorValues();
 

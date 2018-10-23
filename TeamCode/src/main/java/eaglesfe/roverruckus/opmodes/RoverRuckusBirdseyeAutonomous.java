@@ -1,8 +1,11 @@
-package eaglesfe.common;
+package eaglesfe.roverruckus.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
+
+import eaglesfe.common.VisionBasedRobotPosition;
+import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
 //   |----------------|
 // B |       X+       | R
@@ -11,8 +14,8 @@ import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 // E |       X-       |
 //   |________________|
 
-public abstract class PositionAwareAutonomous extends LinearOpMode {
-    private RoverRuckusRobotPositionEstimator positionEstimator;
+public abstract class RoverRuckusBirdseyeAutonomous extends LinearOpMode {
+    private RoverRuckusBirdseyeTracker tracker;
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if
@@ -44,13 +47,13 @@ public abstract class PositionAwareAutonomous extends LinearOpMode {
     @Override
     public void runOpMode() {
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
-        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
-        positionEstimator.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
-        positionEstimator.start();
+        tracker = new RoverRuckusBirdseyeTracker(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
+        tracker.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
+        tracker.start();
     }
 
     protected VisionBasedRobotPosition getPosition(){
-        return positionEstimator.getCurrentOrLastKnownPosition();
+        return tracker.getCurrentOrLastKnownPosition();
     }
 
     /**

@@ -1,4 +1,4 @@
-package eaglesfe.common;
+package eaglesfe.roverruckus.util;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,7 +18,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoverRuckusRobotPositionEstimator
+import eaglesfe.common.VisionBasedRobotPosition;
+
+public class RoverRuckusBirdseyeTracker
 {
     private static final String VUFORIA_KEY     = "AUmjH6X/////AAABmeSd/rs+aU4giLmf5DG5vUaAfHFLv0/vAnAFxt5vM6cbn1/nI2sdkRSEf6HZLA/is/+VQY5/i6u5fbJ4TugEN8HOxRwvUvkrAeIpgnMYEe3jdD+dPxhE88dB58mlPfVwIPJc2KF4RE7weuRBoZ8KlrEKbNNu20ommdG7S/HXP9Kv/xocj82rgj+iPEaitftALZ6QaGBdfSl3nzVMK8/KgQJNlSbGic/Wf3VI8zcYmMyDslQPK45hZKlHW6ezxdGgJ7VJCax+Of8u/LEwfzqDqBsuS4/moNBJ1mF6reBKe1hIE2ffVTSvKa2t95g7ht3Z4M6yQdsI0ZaJ6AGnl1wTlm8Saoal4zTbm/VCsmZI081h";
     private static final float mmTargetHeight   = 6 * VuforiaBase.MM_PER_INCH;          // the height of the center of the target image above the floor
@@ -34,11 +36,11 @@ public class RoverRuckusRobotPositionEstimator
     private int cameraLeftOffsetMm;
     private int cameraAngleOffsetDeg;
 
-    RoverRuckusRobotPositionEstimator() {
+    RoverRuckusBirdseyeTracker() {
         this(0,0,0, 90);
     }
 
-    RoverRuckusRobotPositionEstimator(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset, int cameraAngle) {
+    public RoverRuckusBirdseyeTracker(float cameraForwardOffset, float cameraLeftOffset, float cameraVerticalOffset, int cameraAngle) {
         this.cameraForwardOffsetMm = (int)(cameraForwardOffset * VuforiaBase.MM_PER_INCH);
         this.cameraVerticalOffsetMm = (int)(cameraVerticalOffset * VuforiaBase.MM_PER_INCH);
         this.cameraLeftOffsetMm = (int)(cameraLeftOffset * VuforiaBase.MM_PER_INCH);
@@ -178,13 +180,13 @@ public class RoverRuckusRobotPositionEstimator
     }
 
     private void assertInitialized() throws IllegalStateException {
-        if (!isInitialized){
+        if (!isInitialized) {
             throw new IllegalStateException("Position estimator has not been initialized. Make sure you call initialize().");
         }
     }
 
     private void assertTrackingStarted() throws IllegalStateException {
-        if (!isInitialized){
+        if (!isInitialized) {
             throw new IllegalStateException("Position estimator is not tracking. Make sure you call start().");
         }
     }
