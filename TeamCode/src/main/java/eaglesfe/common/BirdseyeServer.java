@@ -11,26 +11,22 @@ import java.util.Locale;
 
 public class BirdseyeServer extends WebSocketServer{
 
-    public Telemetry opModeTelemetry;
+    private Telemetry opModeTelemetry;
 
     private void postToTelemetry(String message) {
         opModeTelemetry.addData("BIRDSEYE", message);
         opModeTelemetry.update();
     }
 
-    public BirdseyeServer(int port, Telemetry telemetry) throws UnknownHostException {
+    private BirdseyeServer(int port, Telemetry telemetry) throws UnknownHostException {
         super( new InetSocketAddress( port ) );
         opModeTelemetry = telemetry;
     }
 
-    public BirdseyeServer(InetSocketAddress address ) {
-        super( address );
-    }
-
-    public static BirdseyeServer GetInstance(Telemetry telemetry) {
+    public static BirdseyeServer GetInstance(int port, Telemetry telemetry) {
         BirdseyeServer server = null;
         try {
-            server = new BirdseyeServer(3708, telemetry);
+            server = new BirdseyeServer(port, telemetry);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -65,7 +61,6 @@ public class BirdseyeServer extends WebSocketServer{
     @Override
     public void onStart() {
         postToTelemetry(String.format(Locale.US, "The eagle has perched on port %d!", this.getPort()));
-        System.out.println(String.format(Locale.US, "The eagle has perched on port %d!", this.getPort()));
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
     }

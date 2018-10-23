@@ -1,10 +1,11 @@
-package eaglesfe.common;
+package eaglesfe.roverruckus.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
-import java.net.UnknownHostException;
+import eaglesfe.common.FieldPosition;
+import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
 //   |----------------|
 // B |       X+       | R
@@ -13,10 +14,8 @@ import java.net.UnknownHostException;
 // E |       X-       |
 //   |________________|
 
-public abstract class PositionAwareTeleOp extends OpMode {
-
-    private RoverRuckusRobotPositionEstimator positionEstimator;
-    protected RobotPosition position = RobotPosition.UNKNOWN;
+public abstract class RoverRuckusBirdseyeAutonomous extends LinearOpMode {
+    private RoverRuckusBirdseyeTracker tracker;
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if
@@ -44,26 +43,24 @@ public abstract class PositionAwareTeleOp extends OpMode {
      */
     protected int getCameraAngle() { return 90; }
 
-
-    // Make sure you call super.init() in your derived class.
+    // Make sure you call super.runOpMode() in your derived class.
     @Override
-    public void init() {
+    public void runOpMode() {
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
-        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
-        positionEstimator.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
-        positionEstimator.start();
+        tracker = new RoverRuckusBirdseyeTracker(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
+        tracker.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
+        tracker.start();
     }
 
-    // Make sure you call super.loop() in your derived class.
-    @Override
-    public void loop() {
-        position = positionEstimator.getCurrentOrLastKnownPosition();
+    protected FieldPosition getPosition(){
+        return tracker.getCurrentOrLastKnownPosition();
     }
 
     /**
      * Adds the current XYZ and PRH information to the telemetry. Does not call telemetry.update().
      */
-    public void addPositionToTelemetry(){
+    protected final void addPositionToTelemetry(){
+        FieldPosition position = getPosition();
         position.addToTelemetry(telemetry, false);
     }
 }

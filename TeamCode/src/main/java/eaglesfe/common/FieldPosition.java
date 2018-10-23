@@ -13,15 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Console;
-
 import static java.lang.Float.NaN;
 
-public class RobotPosition {
+public class FieldPosition {
 
-    public static final RobotPosition UNKNOWN = new RobotPosition();
+    public static final FieldPosition UNKNOWN = new FieldPosition();
 
-    public RobotPosition(float x, float y, float z, float roll, float pitch, float heading){
+    public FieldPosition(float x, float y, float z, float roll, float pitch, float heading){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -30,7 +28,7 @@ public class RobotPosition {
         this.heading = heading;
     }
 
-    protected RobotPosition(){
+    protected FieldPosition(){
         this.x = NaN;
         this.y = NaN;
         this.z = NaN;
@@ -39,11 +37,11 @@ public class RobotPosition {
         this.heading = NaN;
     }
 
-    RobotPosition(OpenGLMatrix matrix) {
+    public FieldPosition(OpenGLMatrix matrix) {
         this(matrix.getTranslation(), Orientation.getOrientation(matrix, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
     }
 
-    private RobotPosition(VectorF translation, Orientation rotation){
+    private FieldPosition(VectorF translation, Orientation rotation){
         this.x = translation.get(0) / VuforiaBase.MM_PER_INCH;
         this.y = translation.get(1) / VuforiaBase.MM_PER_INCH;
         this.z = translation.get(2) / VuforiaBase.MM_PER_INCH;

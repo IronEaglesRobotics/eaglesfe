@@ -1,4 +1,4 @@
-package eaglesfe.roverruckus.teleop;
+package eaglesfe.roverruckus.opmodes.teleop;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -11,20 +11,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import eaglesfe.common.BirdseyeServer;
-import eaglesfe.common.RobotPosition;
+import eaglesfe.common.FieldPosition;
 
 @TeleOp(name="Birdseye Test", group ="Experimental")
 public class BirdseyeTest extends OpMode {
 
     protected BirdseyeServer birdseye;
 
-    private RobotPosition debugData = new RobotPosition(0,0,0,0,0,0);
+    private FieldPosition debugData = new FieldPosition(0,0,0,0,0,0);
     private boolean debugAxisZig = true;
     private String debugAxis = "X";
 
     @Override
     public void init() {
-        birdseye = BirdseyeServer.GetInstance(this.telemetry);
+        birdseye = BirdseyeServer.GetInstance(3708, this.telemetry);
         birdseye.start();
         debugTimer.scheduleAtFixedRate(debugTask, 0, 100);
     }

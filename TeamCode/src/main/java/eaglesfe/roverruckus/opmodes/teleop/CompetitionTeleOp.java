@@ -1,10 +1,10 @@
-package eaglesfe.roverruckus.teleop;
+package eaglesfe.roverruckus.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import eaglesfe.common.PositionAwareTeleOp;
+import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeTeleop;
 
 @TeleOp(name="TeleOp", group ="Competition")
-public class CompetitionTeleOp extends PositionAwareTeleOp {
+public class CompetitionTeleOp extends RoverRuckusBirdseyeTeleop {
 
     @Override
     public void init() {

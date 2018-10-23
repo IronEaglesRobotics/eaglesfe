@@ -1,8 +1,11 @@
-package eaglesfe.common;
+package eaglesfe.roverruckus.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
+
+import eaglesfe.common.FieldPosition;
+import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
 //   |----------------|
 // B |       X+       | R
@@ -11,8 +14,10 @@ import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 // E |       X-       |
 //   |________________|
 
-public abstract class PositionAwareAutonomous extends LinearOpMode {
-    private RoverRuckusRobotPositionEstimator positionEstimator;
+public abstract class RoverRuckusBirdseyeTeleop extends OpMode {
+
+    private RoverRuckusBirdseyeTracker tracker;
+    protected FieldPosition position = FieldPosition.UNKNOWN;
 
     /**
      * Gets whether the back-facing camera of the Robot Controller (false) or if
@@ -40,24 +45,26 @@ public abstract class PositionAwareAutonomous extends LinearOpMode {
      */
     protected int getCameraAngle() { return 90; }
 
-    // Make sure you call super.runOpMode() in your derived class.
+
+    // Make sure you call super.init() in your derived class.
     @Override
-    public void runOpMode() {
+    public void init() {
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
-        positionEstimator = new RoverRuckusRobotPositionEstimator(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
-        positionEstimator.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
-        positionEstimator.start();
+        tracker = new RoverRuckusBirdseyeTracker(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
+        tracker.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
+        tracker.start();
     }
 
-    protected RobotPosition getPosition(){
-        return positionEstimator.getCurrentOrLastKnownPosition();
+    // Make sure you call super.loop() in your derived class.
+    @Override
+    public void loop() {
+        position = tracker.getCurrentOrLastKnownPosition();
     }
 
     /**
      * Adds the current XYZ and PRH information to the telemetry. Does not call telemetry.update().
      */
-    protected final void addPositionToTelemetry(){
-        RobotPosition position = getPosition();
+    public void addPositionToTelemetry(){
         position.addToTelemetry(telemetry, false);
     }
 }
