@@ -17,7 +17,6 @@ public class CompetitionTeleOp extends PositionAwareTeleOp {
 
         robot = new IronEaglesRobotRoverRuckus(hardwareMap);
         /* Do hardware initialization stuff here */
-
     }
 
     @Override
@@ -30,18 +29,21 @@ public class CompetitionTeleOp extends PositionAwareTeleOp {
         double x = gamepad1.left_stick_x;
         double y = gamepad1.left_stick_y;
         double z = gamepad1.right_stick_x;
-        float lu = gamepad1.right_trigger;
-        float ld = gamepad1.left_trigger;
-        float eo = gamepad2.right_trigger;
-        float ei = gamepad2.left_trigger;
-        boolean cu = gamepad2.dpad_up;
-        boolean cd = gamepad2.dpad_down;
-
+        float liftUp = gamepad1.right_trigger;
+        float liftDown = gamepad1.left_trigger;
+        float extendOut = gamepad2.right_trigger;
+        float extendIn = gamepad2.left_trigger;
+        boolean collectorUp = gamepad2.dpad_up;
+        boolean collectorDown = gamepad2.dpad_down;
+        boolean collectorLeft = gamepad2.x;
+        boolean collectorRight = gamepad2.b;
 
         robot.get_drive().updateMotors(x, y, z);
-        robot.get_Arms() .updateArms(lu, ld, cu, cd, eo, ei);
+        robot.get_Arms() .updateArms(liftUp, liftDown, collectorUp, collectorDown, extendOut, extendIn, collectorLeft, collectorRight);
 
         addPositionToTelemetry();
+        telemetry.addData("Left:", robot.get_Arms().getCollectorLeft());
+        telemetry.addData("Right", robot.get_Arms().getCollectorRight());
         telemetry.update();
     }
 }

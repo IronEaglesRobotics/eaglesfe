@@ -49,12 +49,10 @@ public class MecanumDrive {
             brPower /= max;
         }
 
-
         frontLeft.setPower(flPower);
         frontRight.setPower(frPower);
         backLeft.setPower(blPower);
         backRight.setPower(brPower);
-
 
     }
 }

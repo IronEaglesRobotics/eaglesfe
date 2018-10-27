@@ -2,6 +2,8 @@ package eaglesfe.roverruckus;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
@@ -28,33 +30,37 @@ public class IronEaglesRobotRoverRuckus {
     }
     private void initializeHardware(){
         // Initialize Drive Base
-        DcMotor fl = this._hardwareMap.get(DcMotor.class, Constants.FrontLeft_Name);
-        DcMotor fr = this._hardwareMap.get(DcMotor.class, Constants.FrontRight_Name);
-        DcMotor bl = this._hardwareMap.get(DcMotor.class, Constants.BackLeft_Name);
-        DcMotor br = this._hardwareMap.get(DcMotor.class, Constants.BackRight_Name);
-        DcMotor L = this._hardwareMap.get(DcMotor.class, Constants.Lift);
-        DcMotor A = this._hardwareMap.get(DcMotor.class, Constants.Arm);
-        DcMotor E = this._hardwareMap.get(DcMotor.class, Constants.Extend);
+        DcMotor frontLeft = this._hardwareMap.get(DcMotor.class, Constants.frontLeft_Name);
+        DcMotor frontRight = this._hardwareMap.get(DcMotor.class, Constants.frontRight_Name);
+        DcMotor backLeft = this._hardwareMap.get(DcMotor.class, Constants.backLeft_Name);
+        DcMotor backRight = this._hardwareMap.get(DcMotor.class, Constants.backRight_Name);
+        DcMotor lift = this._hardwareMap.get(DcMotor.class, Constants.Lift);
+        DcMotor armAngle = this._hardwareMap.get(DcMotor.class, Constants.Arm);
+        DcMotor extend = this._hardwareMap.get(DcMotor.class, Constants.Extend);
+        Servo collectorLeft = this._hardwareMap.get(Servo.class, Constants.CollectLeft);
+        Servo collectorRight = this._hardwareMap.get(Servo.class, Constants.CollectRight);
 
-        fl.setDirection(FORWARD);
-        fr.setDirection(FORWARD);
-        bl.setDirection(REVERSE);
-        br.setDirection(REVERSE);
-        L.setDirection(FORWARD);
-        A.setDirection(FORWARD);
-        E.setDirection(FORWARD);
+        frontLeft.setDirection(FORWARD);
+        frontRight.setDirection(FORWARD);
+        backLeft.setDirection(REVERSE);
+        backRight.setDirection(REVERSE);
+        lift.setDirection(FORWARD);
+        armAngle.setDirection(FORWARD);
+        extend.setDirection(FORWARD);
 
-        _drive = new MecanumDrive(fl, fr, bl, br);
-        _Arms = new Arms(L, A, E);
+        _drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
+        _Arms = new Arms(lift, armAngle, extend, collectorLeft, collectorRight);
     }
 
     public class Constants {
-        static final String FrontLeft_Name = "FrontLeft";
-        static final String FrontRight_Name = "FrontRight";
-        static final String BackLeft_Name = "BackLeft";
-        static final String BackRight_Name = "BackRight";
+        static final String frontLeft_Name = "FrontLeft";
+        static final String frontRight_Name = "FrontRight";
+        static final String backLeft_Name = "BackLeft";
+        static final String backRight_Name = "BackRight";
         static final String Lift = "Lift";
         static final String Arm = "Arm";
         static final String Extend = "Extend";
+        static final String CollectLeft = "CollectLeft";
+        static final String CollectRight = "CollectRight";
     }
 }
