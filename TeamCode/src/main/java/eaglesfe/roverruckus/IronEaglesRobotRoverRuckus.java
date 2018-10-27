@@ -34,6 +34,7 @@ public class IronEaglesRobotRoverRuckus {
         DcMotor br = this._hardwareMap.get(DcMotor.class, Constants.BackRight_Name);
         DcMotor L = this._hardwareMap.get(DcMotor.class, Constants.Lift);
         DcMotor A = this._hardwareMap.get(DcMotor.class, Constants.Arm);
+        DcMotor E = this._hardwareMap.get(DcMotor.class, Constants.Extend);
 
         fl.setDirection(FORWARD);
         fr.setDirection(FORWARD);
@@ -41,9 +42,10 @@ public class IronEaglesRobotRoverRuckus {
         br.setDirection(REVERSE);
         L.setDirection(FORWARD);
         A.setDirection(FORWARD);
+        E.setDirection(FORWARD);
 
         _drive = new MecanumDrive(fl, fr, bl, br);
-        _Arms = new Arms(L, A);
+        _Arms = new Arms(L, A, E);
     }
 
     public class Constants {
@@ -53,5 +55,6 @@ public class IronEaglesRobotRoverRuckus {
         static final String BackRight_Name = "BackRight";
         static final String Lift = "Lift";
         static final String Arm = "Arm";
+        static final String Extend = "Extend";
     }
 }

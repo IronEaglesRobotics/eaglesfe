@@ -30,13 +30,16 @@ public class CompetitionTeleOp extends PositionAwareTeleOp {
         double x = gamepad1.left_stick_x;
         double y = gamepad1.left_stick_y;
         double z = gamepad1.right_stick_x;
-        boolean lu = gamepad1.dpad_up;
-        boolean ld = gamepad1.dpad_down;
-        boolean cu = gamepad1.dpad_right;
-        boolean cd = gamepad1.dpad_left;
+        float lu = gamepad1.right_trigger;
+        float ld = gamepad1.left_trigger;
+        float eo = gamepad2.right_trigger;
+        float ei = gamepad2.left_trigger;
+        boolean cu = gamepad2.dpad_up;
+        boolean cd = gamepad2.dpad_down;
+
 
         robot.get_drive().updateMotors(x, y, z);
-        robot.get_Arms() .updateArms(lu, ld, cu, cd);
+        robot.get_Arms() .updateArms(lu, ld, cu, cd, eo, ei);
 
         addPositionToTelemetry();
         telemetry.update();
