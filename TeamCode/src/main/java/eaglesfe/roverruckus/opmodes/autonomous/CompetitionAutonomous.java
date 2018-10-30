@@ -1,15 +1,11 @@
-package eaglesfe.roverruckus.autonomous;
+package eaglesfe.roverruckus.opmodes.autonomous;
 import android.graphics.Point;
 
-import eaglesfe.common.MathHelpers;
-import eaglesfe.common.MecanumDrive;
-import eaglesfe.common.PositionAwareAutonomous;
-import eaglesfe.common.RobotPosition;
+import eaglesfe.common.FieldPosition;
 import eaglesfe.roverruckus.IronEaglesRobotRoverRuckus;
+import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeAutonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous(name="Autonomous", group ="Competition")
 public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
@@ -22,7 +18,7 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
 
         robot = new IronEaglesRobotRoverRuckus(hardwareMap);
 
-        RobotPosition currentPosition;
+        FieldPosition currentPosition;
         final Point TARGET = new Point(-50, 0); // for testing
 
         waitForStart();
