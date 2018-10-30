@@ -5,6 +5,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.json.JSONObject;
+
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
@@ -61,9 +62,11 @@ public class BirdseyeServer extends WebSocketServer{
         postToTelemetry("Server encountered an error. " + ex.getMessage());
     }
 
+
     @Override
     public void onStart() {
         postToTelemetry(String.format(Locale.US, "The eagle has perched on port %d!", this.getPort()));
+        opModeTelemetry.update();
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
     }

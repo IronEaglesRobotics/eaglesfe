@@ -1,38 +1,41 @@
 package eaglesfe.roverruckus.opmodes.autonomous;
-import android.graphics.Point;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import eaglesfe.common.BirdseyeServer;
 import eaglesfe.common.FieldPosition;
 import eaglesfe.roverruckus.IronEaglesRobotRoverRuckus;
 import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeAutonomous;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
 @Autonomous(name="Autonomous", group ="Competition")
 public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
-
+    protected BirdseyeServer birdseye;
     IronEaglesRobotRoverRuckus robot;
 
     @Override
     public void runOpMode() {
         super.runOpMode();
 
+        birdseye = BirdseyeServer.GetInstance(3708, this.telemetry);
+        birdseye.start();
+
         robot = new IronEaglesRobotRoverRuckus(hardwareMap);
 
         FieldPosition currentPosition;
-        final Point TARGET = new Point(-50, 0); // for testing
-
         waitForStart();
         while(opModeIsActive()){
-            /* Do robot stuff here. */
-            /* Use this.getPosition() to determine your position on the field. */
             currentPosition = getPosition();
-
-            double rise = TARGET.y - currentPosition.y;
-            double run = TARGET.x - currentPosition.x;
-            moveTowardPosition(run, rise);
+            birdseye.broadcast(currentPosition.asJSONObject());
 
             this.addPositionToTelemetry();
             telemetry.update();
+            
+            this.sleep(250);
+        }
+
+        try {
+            birdseye.stop(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
