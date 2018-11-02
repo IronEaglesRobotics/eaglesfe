@@ -45,13 +45,21 @@ public abstract class RoverRuckusBirdseyeTeleop extends OpMode {
      */
     protected int getCameraAngle() { return 90; }
 
+    public RoverRuckusBirdseyeTeleop() {
+        this.msStuckDetectInit = 10000;
+        this.msStuckDetectStart = 10000;
+    }
 
     // Make sure you call super.init() in your derived class.
     @Override
     public void init() {
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
         tracker = new RoverRuckusBirdseyeTracker(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
-        tracker.initialize(this.hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
+    }
+
+    @Override
+    public void start() {
+        tracker.initialize(hardwareMap, shouldUseWebcam(), shouldShowCameraPreview());
         tracker.start();
     }
 

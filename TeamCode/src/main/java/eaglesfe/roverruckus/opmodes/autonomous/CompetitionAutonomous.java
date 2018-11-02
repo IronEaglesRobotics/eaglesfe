@@ -10,6 +10,8 @@ import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeAutonomous;
 public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
     protected BirdseyeServer birdseye;
     IronEaglesRobotRoverRuckus robot;
+    @Override
+    protected boolean shouldShowCameraPreview() {return false;}
 
     @Override
     public void runOpMode() {
@@ -28,8 +30,8 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
 
             this.addPositionToTelemetry();
             telemetry.update();
-            
-            this.sleep(250);
+
+            this.sleep(100);
         }
 
         try {

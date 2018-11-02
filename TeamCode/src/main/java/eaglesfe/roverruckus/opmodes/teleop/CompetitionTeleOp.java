@@ -40,7 +40,6 @@ public class CompetitionTeleOp extends RoverRuckusBirdseyeTeleop {
         robot.get_drive().updateMotors(x, y, z);
         robot.get_Arms() .updateArms(liftUp, liftDown, collectorUp, collectorDown, extendOut, extendIn, collectorLeft, collectorRight);
 
-        addPositionToTelemetry();
         telemetry.addData("Left:", robot.get_Arms().getCollectorLeft());
         telemetry.addData("Right", robot.get_Arms().getCollectorRight());
         telemetry.update();
