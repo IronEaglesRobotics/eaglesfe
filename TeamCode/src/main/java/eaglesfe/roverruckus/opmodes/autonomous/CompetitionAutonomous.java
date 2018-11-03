@@ -23,37 +23,66 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
         birdseye = BirdseyeServer.GetInstance(3708, this.telemetry);
         birdseye.start();
 
-        int currentTarget = 0;
-        int[][] target = {
-                {0,0},
-                {10,10}
-        };
+//        int currentTarget = 0;
+//        int[][] target = {
+//                {0,0},
+//                {10,10}
+//        };
 
         robot = new IronEaglesRobotRoverRuckus(hardwareMap);
 
         FieldPosition currentPosition;
         waitForStart();
 
-        moveTowardHeightTime(.5, 500);
+        //moveTowardHeightTime(.25, 500);
+        final Point TARGET = new Point(0, 36);
+
+//        while(opModeIsActive() && currentTarget < target.length){
+        long start = System.currentTimeMillis();
 
         while(opModeIsActive()){
-            final Point TARGET = new Point(target[currentTarget][0], target[currentTarget][1]);
+            telemetry.addData("","opmodeactive");
             currentPosition = getPosition();
 
-            if (currentTarget <= target.length) {
-
+            if (System.currentTimeMillis() - start > 500) {
                 birdseye.broadcast(currentPosition.asJSONObject());
+                start = System.currentTimeMillis();
+            }
 
                 double rise = TARGET.y - currentPosition.y;
                 double run = TARGET.x - currentPosition.x;
 
-                moveTowardPosition(run, rise);
-            }
+                double ratio = rise/run;
+
+                double t = Math.atan(ratio);
+
+                double angle = Math.toDegrees(t);
+
+                angle -= currentPosition.heading;
+
+                angle = Math.toRadians(angle);
+
+                double newRatio = Math.tan(angle);
+
+                double nrise = newRatio;
+                double nrun = 1;
+
+                double x = nrise;
+                double y = nrun;
+
+                double max = Math.max(Math.abs(x), Math.abs(y));
+
+                x /= max;
+                y /= max;
+
+                moveTowardPosition(x *.5 , y*.5);
 
             this.addPositionToTelemetry();
+            telemetry.addData("rise:", rise);
+            telemetry.addData("run", run);
             telemetry.update();
 
-            if ((currentPosition.x - target[currentTarget][0] < 10) && (currentPosition.y - target[currentTarget][1] < 10)) {currentTarget++;}
+//            if ((currentPosition.x - target[currentTarget][0] < 1) && (currentPosition.y - target[currentTarget][1] < 1)) {currentTarget++;}
         }
 
         try {
@@ -64,13 +93,12 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
     }
 
     public void moveTowardPosition(double x, double y){
-        robot.get_drive().updateMotors(x, y, 0);
+        robot.get_drive().updateMotors(-x, -y, 0);
     }
 
     //public void moveTowardHeight(float z) { robot.get_Arms().updateArms(z,-z,0, 0); }
 
     public void moveTowardHeightTime(double z, int millis) { robot.get_Arms().updateArmsTime(z, 0,0,0, millis);}
-
 }
 
 

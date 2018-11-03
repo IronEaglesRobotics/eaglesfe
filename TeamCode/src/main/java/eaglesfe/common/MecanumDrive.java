@@ -36,7 +36,7 @@ public class MecanumDrive {
         blPower = -z + x + y;
         brPower = -z + x - y;
 
-        double max = (Math.round(Math.abs(z))) +(Math.round(Math.abs(y)))+(Math.round(Math.abs(x)));
+        double max = (Math.abs(z) + Math.abs(y) + Math.abs(x));
 
         if (max < 1) {
             flPower /= 1;
