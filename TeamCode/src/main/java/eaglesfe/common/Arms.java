@@ -41,30 +41,37 @@ public class Arms {
         this.CollectorRight.setPosition(0);
     }
 
-    public void updateArms(float liftUp, float liftDown, boolean collectorUp, boolean collectorDown, float extendOut,
-                           float extendIn, boolean collectorLeft, boolean collectorRight) {
+    public void updateArms(float liftUp, float liftDown, float extendOut, float extendIn) {
 
-        boolean isLeftOpen = CollectorLeft.getPosition() > 0.5;
-        boolean isRightOpen = CollectorRight.getPosition() > 0.5;
+        Lift.setPower(liftUp - liftDown);
+        Extend.setPower(extendOut - extendIn);
+
+    }
+
+    public void updateArmsTime(double liftUp, float liftDown, float extendOut, float extendIn, long millis) {
+
+        long tStart = System.currentTimeMillis();
+        while (tStart - System.currentTimeMillis() <= millis) {
+            Lift.setPower(liftUp - liftDown);
+            Extend.setPower(extendOut - extendIn);
+        }
+
+    }
+
+    public void updateCollector(float collectorUp, boolean collectorLeft, boolean collectorRight) {
+
+        boolean isLeftOpen = CollectorLeft.getPosition() > 0.35;
+        boolean isRightOpen = CollectorRight.getPosition() > 0.1;
 
         if (collectorLeft && !leftLast) {
-            CollectorLeft.setPosition(isLeftOpen ? 0 : 1);
+            CollectorLeft.setPosition(isLeftOpen ? .3 : 1);
         }
 
         if (collectorRight && !rightLast) {
             CollectorRight.setPosition(isRightOpen ? 0 : 1);
         }
 
-        Lift.setPower(liftUp - liftDown);
-        Extend.setPower(extendOut - extendIn);
-
-        if (collectorUp && !collectorDown) {
-            Collector.setPower(1);
-        } else if (!collectorUp && collectorDown) {
-            Collector.setPower(-1);
-        } else {
-            Collector.setPower(0);
-        }
+        Collector.setPower(collectorUp * collectorUp * collectorUp);
 
         this.leftLast = collectorLeft;
         this.rightLast = collectorRight;
