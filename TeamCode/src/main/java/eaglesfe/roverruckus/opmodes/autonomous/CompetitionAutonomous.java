@@ -41,7 +41,7 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
         }
     }
 
-    public void moveTowardPosition(double x, double y){
-        robot.get_drive().updateMotors(x, y, 0);
-    }
+    public void moveTowardPosition(double x, double y){ robot.get_drive().updateMotors(x, y, 0); }
+    public void moveUpAndDown(double z) { robt }
 }
+
