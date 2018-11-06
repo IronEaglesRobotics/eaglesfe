@@ -1,5 +1,6 @@
 package eaglesfe.common;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import  com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -12,16 +13,21 @@ public class Arms {
     private DcMotor Extend;
     private Servo CollectorLeft;
     private Servo CollectorRight;
+    private Servo sensorStick;
+    private ColorSensor sample;
     boolean leftLast;
     boolean rightLast;
-    boolean bothLast;
 
-    public Arms(DcMotor Lift, DcMotor Collector, DcMotor Extend, Servo CollectorLeft, Servo CollectorRight) {
+
+    public Arms(DcMotor Lift, DcMotor Collector, DcMotor Extend, Servo CollectorLeft, Servo CollectorRight,
+                Servo sensorStick, ColorSensor sample) {
         this.Lift = Lift;
         this.Collector = Collector;
         this.Extend = Extend;
         this.CollectorLeft = CollectorLeft;
         this.CollectorRight = CollectorRight;
+        this.sensorStick = sensorStick;
+        this.sample = sample;
 
         this.Lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.Collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -33,12 +39,17 @@ public class Arms {
 
         this.CollectorLeft.setDirection(Servo.Direction.REVERSE);
         this.CollectorRight.setDirection(Servo.Direction.FORWARD);
+        this.sensorStick.setDirection(Servo.Direction.FORWARD);
 
         this.CollectorLeft.scaleRange(0, .75);
         this.CollectorRight.scaleRange(0, .75);
+        this.sensorStick.scaleRange(0,1);
 
         this.CollectorLeft.setPosition(0);
         this.CollectorRight.setPosition(0);
+        this.sensorStick.setPosition(0);
+
+        this.sample.enableLed(true);
     }
 
     public void updateArms(float liftUp, float liftDown, float extendOut, float extendIn) {
@@ -48,30 +59,31 @@ public class Arms {
 
     }
 
-    public void updateArmsTime(double liftUp, float liftDown, float extendOut, float extendIn, long millis) {
+    public void updateArmsTime(double liftUp, float liftDown, float extendOut, float extendIn, long millis, long tStart) {
 
-        long tStart = System.currentTimeMillis();
-        while (tStart - System.currentTimeMillis() <= millis) {
+        while (System.currentTimeMillis() - tStart <= millis) {
             Lift.setPower(liftUp - liftDown);
             Extend.setPower(extendOut - extendIn);
         }
 
+        Lift.setPower(0);
+        Extend.setPower(0);
     }
 
     public void updateCollector(float collectorUp, boolean collectorLeft, boolean collectorRight) {
 
-        boolean isLeftOpen = CollectorLeft.getPosition() > 0.35;
+        boolean isLeftOpen = CollectorLeft.getPosition() > 0.33;
         boolean isRightOpen = CollectorRight.getPosition() > 0.1;
 
         if (collectorLeft && !leftLast) {
-            CollectorLeft.setPosition(isLeftOpen ? .3 : 1);
+            CollectorLeft.setPosition(isLeftOpen ? 0 : .5);
         }
 
         if (collectorRight && !rightLast) {
             CollectorRight.setPosition(isRightOpen ? 0 : 1);
         }
 
-        Collector.setPower(collectorUp * collectorUp * collectorUp);
+        Collector.setPower(collectorUp * collectorUp * collectorUp * -1);
 
         this.leftLast = collectorLeft;
         this.rightLast = collectorRight;
