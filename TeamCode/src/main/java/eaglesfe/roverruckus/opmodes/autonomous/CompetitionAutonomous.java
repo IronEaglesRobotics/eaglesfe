@@ -23,23 +23,24 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
         birdseye = BirdseyeServer.GetInstance(3708, this.telemetry);
         birdseye.start();
 
-        int currentTarget = 0;
-        int[][] target = {
-                {11,17},
-                {15,25}
-        };
+//        int currentTarget = 0;
+//        int[][] target = {
+//                {0,0},
+//                {10,10}
+//        };
 
         robot = new IronEaglesRobotRoverRuckus(hardwareMap);
 
         FieldPosition currentPosition;
         waitForStart();
 
-        moveTowardHeightTime(.90, 1200);
-        final Point TARGET = new Point(target[currentTarget][0], target[currentTarget][1]);
+        //moveTowardHeightTime(.25, 500);
+        final Point TARGET = new Point(0, 36);
 
+//        while(opModeIsActive() && currentTarget < target.length){
         long start = System.currentTimeMillis();
 
-        while(opModeIsActive() && currentTarget < target.length){
+        while(opModeIsActive()){
             telemetry.addData("","opmodeactive");
             currentPosition = getPosition();
 
@@ -81,7 +82,7 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
             telemetry.addData("run", run);
             telemetry.update();
 
-            if ((currentPosition.x - target[currentTarget][0] < 1) && (currentPosition.y - target[currentTarget][1] < 1)) {currentTarget++;}
+//            if ((currentPosition.x - target[currentTarget][0] < 1) && (currentPosition.y - target[currentTarget][1] < 1)) {currentTarget++;}
         }
 
         try {
@@ -97,7 +98,7 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
 
     //public void moveTowardHeight(float z) { robot.get_Arms().updateArms(z,-z,0, 0); }
 
-    public void moveTowardHeightTime(double z, long millis) { robot.get_Arms().updateArmsTime(-z, 0,0,0, millis, System.currentTimeMillis());}
+    public void moveTowardHeightTime(double z, int millis) { robot.get_Arms().updateArmsTime(z, 0,0,0, millis);}
 }
 
 

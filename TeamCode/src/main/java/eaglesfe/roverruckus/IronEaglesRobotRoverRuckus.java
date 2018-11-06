@@ -1,6 +1,5 @@
 package eaglesfe.roverruckus;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -40,8 +39,6 @@ public class IronEaglesRobotRoverRuckus {
         DcMotor extend = this._hardwareMap.get(DcMotor.class, Constants.Extend);
         Servo collectorLeft = this._hardwareMap.get(Servo.class, Constants.CollectLeft);
         Servo collectorRight = this._hardwareMap.get(Servo.class, Constants.CollectRight);
-        Servo sensorStick = this._hardwareMap.get(Servo.class, Constants.sensorStick);
-        ColorSensor sample = this._hardwareMap.get(ColorSensor.class, Constants.sample);
 
         frontLeft.setDirection(FORWARD);
         frontRight.setDirection(FORWARD);
@@ -52,7 +49,7 @@ public class IronEaglesRobotRoverRuckus {
         extend.setDirection(FORWARD);
 
         _drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
-        _Arms = new Arms(lift, armAngle, extend, collectorLeft, collectorRight, sensorStick, sample);
+        _Arms = new Arms(lift, armAngle, extend, collectorLeft, collectorRight);
     }
 
     public class Constants {
@@ -65,7 +62,5 @@ public class IronEaglesRobotRoverRuckus {
         static final String Extend = "Extend";
         static final String CollectLeft = "CollectLeft";
         static final String CollectRight = "CollectRight";
-        static final String sensorStick = "sensorStick";
-        static final String sample = "sample";
     }
 }
