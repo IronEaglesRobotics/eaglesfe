@@ -56,4 +56,13 @@ public class MecanumDrive {
         backRight.setPower(brPower);
 
     }
+
+    public void updateDriveTime(double powerx,double powery,double powerz, long millis, long tStart) {
+
+        while (System.currentTimeMillis() - tStart <= millis) {
+            updateMotors(powerx, powery, powerz);
+        }
+
+        updateMotors(0,0,0);
+    }
 }

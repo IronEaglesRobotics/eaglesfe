@@ -72,18 +72,17 @@ public class Arms {
 
     public void updateCollector(float collectorUp, boolean collectorLeft, boolean collectorRight) {
 
-        boolean isLeftOpen = CollectorLeft.getPosition() > 0.33;
-        boolean isRightOpen = CollectorRight.getPosition() > 0.1;
+        boolean isLeftOpen = CollectorLeft.getPosition() > 0.5;
+        boolean isRightOpen = CollectorRight.getPosition() > 0.5;
 
         if (collectorLeft && !leftLast) {
-            CollectorLeft.setPosition(isLeftOpen ? 0 : .5);
+            CollectorLeft.setPosition(isLeftOpen ? 0 : 1);
         }
 
         if (collectorRight && !rightLast) {
             CollectorRight.setPosition(isRightOpen ? 0 : 1);
         }
-
-        Collector.setPower(collectorUp * collectorUp * collectorUp * -1);
+        Collector.setPower(collectorUp * -1);
 
         this.leftLast = collectorLeft;
         this.rightLast = collectorRight;
@@ -95,6 +94,10 @@ public class Arms {
 
     public double getCollectorRight() {
         return CollectorRight.getPosition();
+    }
+
+    public String getSample(){
+        return String.format("%d %d %d", sample.red(), sample.green(), sample.blue());
     }
 }
 

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
+import eaglesfe.common.BirdseyeServer;
 import eaglesfe.common.FieldPosition;
 import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
@@ -16,6 +17,7 @@ import eaglesfe.roverruckus.util.RoverRuckusBirdseyeTracker;
 
 public abstract class RoverRuckusBirdseyeTeleop extends OpMode {
 
+    protected BirdseyeServer birdseye;
     private RoverRuckusBirdseyeTracker tracker;
     protected FieldPosition position = FieldPosition.UNKNOWN;
 
@@ -53,6 +55,8 @@ public abstract class RoverRuckusBirdseyeTeleop extends OpMode {
     // Make sure you call super.init() in your derived class.
     @Override
     public void init() {
+        birdseye = BirdseyeServer.GetInstance(3708, this.telemetry);
+        birdseye.start();
         Geometry.Point3 cameraPosition = getCameraPositionOnRobot();
         tracker = new RoverRuckusBirdseyeTracker(cameraPosition.y, cameraPosition.x, cameraPosition.z, getCameraAngle());
     }

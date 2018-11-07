@@ -7,11 +7,11 @@ import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
 
 import eaglesfe.common.BirdseyeServer;
 import eaglesfe.common.FieldPosition;
-import eaglesfe.common.MathHelpers;
 import eaglesfe.roverruckus.IronEaglesRobotRoverRuckus;
 import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeAutonomous;
+
 @Autonomous(name="Autonomous", group ="Competition")
-public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
+public class AutonomousDepotDead extends RoverRuckusBirdseyeAutonomous {
     protected BirdseyeServer birdseye;
     IronEaglesRobotRoverRuckus robot;
     @Override

@@ -35,7 +35,7 @@ public abstract class RoverRuckusBirdseyeAutonomous extends LinearOpMode {
      * Sets the XYZ position of the tracking camera relative to the center point of the bottom of the robot.
      */
     protected Geometry.Point3 getCameraPositionOnRobot() {
-        return new Geometry.Point3(0.4f,8.0f,5.25f);
+        return new Geometry.Point3(0,0,0);
     }
 
     /**
