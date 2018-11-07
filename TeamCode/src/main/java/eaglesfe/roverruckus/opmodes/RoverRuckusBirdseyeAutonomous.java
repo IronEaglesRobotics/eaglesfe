@@ -35,13 +35,13 @@ public abstract class RoverRuckusBirdseyeAutonomous extends LinearOpMode {
      * Sets the XYZ position of the tracking camera relative to the center point of the bottom of the robot.
      */
     protected Geometry.Point3 getCameraPositionOnRobot() {
-        return new Geometry.Point3(0,0,0);
+        return new Geometry.Point3(0.4f,8.0f,5.25f);
     }
 
     /**
      * Sets the Z angle of the tracking camera. 0 degrees = RIGHT, 90 = FORWARD, etc.
      */
-    protected int getCameraAngle() { return 90; }
+    protected int getCameraAngle() { return -90; }
 
     // Make sure you call super.runOpMode() in your derived class.
     @Override
