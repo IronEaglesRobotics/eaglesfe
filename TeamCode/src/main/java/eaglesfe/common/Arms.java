@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import javax.xml.transform.dom.DOMLocator;
+
 public class Arms {
 
     private DcMotor Lift;
@@ -60,15 +62,17 @@ public class Arms {
 
     }
 
-    public void updateArmsTime(double liftUp, float liftDown, float extendOut, float extendIn, long millis, long tStart) {
+    public void updateArmsTime(double liftUp, float liftDown, float extendOut, float extendIn, double collectorUp, long millis, long tStart) {
 
         while (System.currentTimeMillis() - tStart <= millis) {
             Lift.setPower(liftUp - liftDown);
             Extend.setPower(extendOut - extendIn);
+            Collector.setPower(collectorUp);
         }
 
         Lift.setPower(0);
         Extend.setPower(0);
+        Collector.setPower(0);
     }
 
     public void updateCollector(float collectorUp, boolean collectorLeft, boolean collectorRight) {
