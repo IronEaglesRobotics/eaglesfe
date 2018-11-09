@@ -1,6 +1,10 @@
 package eaglesfe.common;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class MecanumDrive {
 
@@ -8,12 +12,14 @@ public class MecanumDrive {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+    private BNO055IMU internalGyro;
 
-    public MecanumDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight){
+    public MecanumDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight, BNO055IMU internalGyro){
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.backLeft = backLeft;
         this.backRight = backRight;
+        this.internalGyro = internalGyro;
 
         this.frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -64,5 +70,22 @@ public class MecanumDrive {
         }
 
         updateMotors(0,0,0);
+    }
+
+    public void updateDriveGyro(double powerz, float rStart, float rTarget, OpMode opMode) {
+        rTarget = (float) Math.toRadians(rTarget);
+        float angleDistance = Math.abs(rTarget - internalGyro.getAngularOrientation().firstAngle);
+        while (Math.abs(internalGyro.getAngularOrientation().firstAngle - rStart) < angleDistance) {
+            updateMotors(0,0,powerz);
+            opMode.telemetry.addData("angle", internalGyro.getAngularOrientation().firstAngle);
+            opMode.telemetry.addData("angle", internalGyro.getAngularOrientation().secondAngle);
+            opMode.telemetry.addData("angle", internalGyro.getAngularOrientation().thirdAngle);
+            opMode.telemetry.update();
+        }
+        updateMotors(0,0,0);
+    }
+
+    public float getCurrentAngle() {
+        return internalGyro.getAngularOrientation().firstAngle;
     }
 }

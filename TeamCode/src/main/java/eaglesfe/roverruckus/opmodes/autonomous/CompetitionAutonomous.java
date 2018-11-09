@@ -35,7 +35,7 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
         FieldPosition currentPosition;
         waitForStart();
 
-        moveTowardHeightTime(.25, 1200);
+//        moveTowardHeightTime(.25, 1200);
         moveAway(.25, 0, 300);
         moveAway(0,-.25,800);
 
@@ -92,8 +92,8 @@ public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
         robot.get_drive().updateMotors(-x, -y, 0);
     }
 
-    public void moveTowardHeightTime(double z, long millis)
-    { robot.get_Arms().updateArmsTime(-z, 0,0,0, millis, System.currentTimeMillis());}
+//    public void moveTowardHeightTime(double z, long millis)
+//    { robot.get_Arms().updateArmsTime(-z, 0,0,0, millis, System.currentTimeMillis());}
 
     public void moveAway(double x,double y, long millis) {
         robot.get_drive().updateDriveTime(y, x,0, millis,System.currentTimeMillis());

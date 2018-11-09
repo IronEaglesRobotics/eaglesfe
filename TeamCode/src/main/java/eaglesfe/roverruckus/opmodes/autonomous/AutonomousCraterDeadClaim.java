@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import eaglesfe.common.FieldPosition;
 import eaglesfe.roverruckus.IronEaglesRobotRoverRuckus;
 
-@Autonomous(name="AutonomousCraterDead", group ="Competition")
-public class AutonomousCraterDead extends LinearOpMode {
+@Autonomous(name="AutonomousCraterDeadClaim", group ="Competition")
+public class AutonomousCraterDeadClaim extends LinearOpMode {
 
     IronEaglesRobotRoverRuckus robot;
 
@@ -20,7 +20,14 @@ public class AutonomousCraterDead extends LinearOpMode {
 
         moveTowardHeightTime(.3,0, 1200);
         moveAway(.3, 0, 300);
-        moveAway(0, -.3, 4100);
+        moveAway(0, -.3, 3800);
+        moveAway(0,.3,1700);
+        moveAway(.3, 0, 2500);
+        rotateAngle(-.3, 40);
+        moveAway(0,-.3, 600);
+        moveAway(.5, 0, 1300);
+        moveTowardHeightTime(0, .75, 200);
+        moveAway(-.5,0,2250);
 
     }
 
