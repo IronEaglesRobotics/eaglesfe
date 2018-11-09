@@ -2,6 +2,7 @@ package eaglesfe.common;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import  com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -45,8 +46,8 @@ public class Arms {
         this.CollectorRight.scaleRange(0, .75);
         this.sensorStick.scaleRange(0,1);
 
-        this.CollectorLeft.setPosition(0);
-        this.CollectorRight.setPosition(0);
+        this.CollectorLeft.setPosition(1);
+        this.CollectorRight.setPosition(1);
         this.sensorStick.setPosition(0);
 
         this.sample.enableLed(true);
