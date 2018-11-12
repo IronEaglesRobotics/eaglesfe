@@ -1,5 +1,7 @@
 package eaglesfe.roverruckus;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -39,6 +41,13 @@ public class IronEaglesRobotRoverRuckus {
         DcMotor extend = this._hardwareMap.get(DcMotor.class, Constants.Extend);
         Servo collectorLeft = this._hardwareMap.get(Servo.class, Constants.CollectLeft);
         Servo collectorRight = this._hardwareMap.get(Servo.class, Constants.CollectRight);
+        Servo sensorStick = this._hardwareMap.get(Servo.class, Constants.sensorStick);
+        ColorSensor sample = this._hardwareMap.get(ColorSensor.class, Constants.sample);
+        BNO055IMU internalGyro = this._hardwareMap.get(BNO055IMU.class, Constants.gyro);
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.loggingEnabled = true;
+        parameters.loggingTag     = "IMU";
+        internalGyro.initialize(parameters);
 
         frontLeft.setDirection(FORWARD);
         frontRight.setDirection(FORWARD);
@@ -48,8 +57,8 @@ public class IronEaglesRobotRoverRuckus {
         armAngle.setDirection(FORWARD);
         extend.setDirection(FORWARD);
 
-        _drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
-        _Arms = new Arms(lift, armAngle, extend, collectorLeft, collectorRight);
+        _drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight, internalGyro);
+        _Arms = new Arms(lift, armAngle, extend, collectorLeft, collectorRight, sensorStick, sample);
     }
 
     public class Constants {
@@ -62,5 +71,8 @@ public class IronEaglesRobotRoverRuckus {
         static final String Extend = "Extend";
         static final String CollectLeft = "CollectLeft";
         static final String CollectRight = "CollectRight";
+        static final String sensorStick = "sensorStick";
+        static final String sample = "sample";
+        static final String gyro = "imu";
     }
 }
