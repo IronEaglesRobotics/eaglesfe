@@ -1,108 +1,182 @@
 package eaglesfe.roverruckus.opmodes.autonomous;
-import android.graphics.Point;
 
+import com.eaglesfe.birdseye.BirdseyeServer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import eaglesfe.common.BirdseyeServer;
-import eaglesfe.common.FieldPosition;
 import eaglesfe.common.MathHelpers;
-import eaglesfe.roverruckus.IronEaglesRobotRoverRuckus;
-import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeAutonomous;
+import eaglesfe.roverruckus.Robot;
+
 @Autonomous(name="Autonomous", group ="Competition")
-public class CompetitionAutonomous extends RoverRuckusBirdseyeAutonomous {
-    protected BirdseyeServer birdseye;
-    IronEaglesRobotRoverRuckus robot;
-    @Override
-    protected Geometry.Point3 getCameraPositionOnRobot() {
-        return new Geometry.Point3(0.4f,8.0f,5.25f);
-    }
+public class CompetitionAutonomous extends LinearOpMode {
+
     @Override
     public void runOpMode() {
-        super.runOpMode();
+        BirdseyeServer      server  =   new BirdseyeServer(3708, telemetry);
+        final Robot         robot   =   new Robot(hardwareMap);
+        robot.setVisionEnabled(true);
 
-        birdseye = BirdseyeServer.GetInstance(3708, this.telemetry);
-        birdseye.start();
+        ArrayList<State> states = new ArrayList<>(Arrays.asList(
 
-        int currentTarget = 0;
-        int[][] target = {
-                {-48,48}
-        };
+                /* Descend from the lander ====================================================== */
+                new State() {
+                    public String getDescription() {
+                       return "Descending from lander...";
+                    }
 
-        robot = new IronEaglesRobotRoverRuckus(hardwareMap);
+                    @Override
+                    public void enter() {
+                        robot.setLiftPosition(1.0, 1.0);
+                    }
 
-        FieldPosition currentPosition;
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isLiftBusy();
+                    }
+
+                    @Override
+                    public void leave() {}
+                },
+                /* ============================================================================== */
+
+                /* Scoot ======================================================================== */
+                new TimedState(1000) {
+                    public String getDescription() {
+                        return "Scoot away from hook...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        super.enter();
+                        robot.setDriveInput(0.0, -0.25, 0);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return super.isFinished();
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.setDriveInput(0,0,0);
+                    }
+                },
+                /* Strafe toward minerals ======================================================= */
+                new State() {
+                    public String getDescription() {
+                        return "Strafe toward minerals...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.useSideCamera();
+                        robot.setDriveInput(-0.2, 0, 0);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return robot.getMineralSample().sampleSize > 0;
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.setDriveInput(0, 0, 0);
+                    }
+                }
+                /* ============================================================================== */
+
+            )
+        );
+
+        // =========================================================================================
+
         waitForStart();
 
-//        moveTowardHeightTime(.25, 1200);
-        moveAway(.25, 0, 300);
-        moveAway(0,-.25,800);
+        for (State state : states) {
+            state.enter();
 
-        final Point TARGET =  new Point(target[currentTarget][0], target[currentTarget][1]);
-
-        long start = System.currentTimeMillis();
-
-        while(opModeIsActive() && currentTarget < target.length){
-            telemetry.addData("","opmodeactive");
-            currentPosition = getPosition();
-
-            if (System.currentTimeMillis() - start > 500) {
-                birdseye.broadcast(currentPosition.asJSONObject());
-                start = System.currentTimeMillis();
-            }
-
-                double rise = TARGET.y - currentPosition.y;
-                double run = TARGET.x - currentPosition.x;
-                double ratio = rise/run;
-                double t = Math.atan(ratio);
-                double angle = Math.toDegrees(t);
-                angle -= currentPosition.heading;
-                angle = Math.toRadians(angle);
-                double newRatio = Math.tan(angle);
-                double nrise = newRatio;
-                double nrun = 1;
-                double x = nrise;
-                double y = nrun;
-                double max = Math.max(Math.abs(x), Math.abs(y));
-                x /= max;
-                y /= max;
-
-                moveTowardPosition(-x*.25, -y*.25);
-
-            this.addPositionToTelemetry();
-            telemetry.addData("Color:RGB",robot.get_Arms().getSample());
-            telemetry.addData("rise:", rise);
-            telemetry.addData("run", run);
+            telemetry.addData("STATE", state.getDescription());
             telemetry.update();
 
-            if ((target[currentTarget][0] - currentPosition.x < .5) && (target[currentTarget][1] - currentPosition.y) < .5) {currentTarget++;}
+            while(state.isEnabled() && !state.isFinished() && opModeIsActive()) {
+
+            }
+
+            state.leave();
         }
 
-        rotate(.5, 100);
+        // =========================================================================================
 
-        try {
-            birdseye.stop(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void moveTowardPosition(double x, double y){
-        robot.get_drive().updateMotors(-x, -y, 0);
-    }
-
-//    public void moveTowardHeightTime(double z, long millis)
-//    { robot.get_Arms().updateArmsTime(-z, 0,0,0, millis, System.currentTimeMillis());}
-
-    public void moveAway(double x,double y, long millis) {
-        robot.get_drive().updateDriveTime(y, x,0, millis,System.currentTimeMillis());
-    }
-
-    public void rotate(double z, long millis) {
-        robot.get_drive().updateDriveTime(0,0, z, millis,System.currentTimeMillis());
+        while (opModeIsActive()) {}
+        robot.disable();
     }
 }
 
+abstract class State {
+    public abstract String getDescription();
+    public boolean isEnabled() { return true; }
+    public abstract void enter();
+    public abstract boolean isFinished();
+    public abstract void  leave();
+}
 
+abstract class TimedState extends State {
+    private long runUntil;
+    private int duration;
 
+    public TimedState(int duration){
+        this.duration = duration;
+    }
+
+    @Override
+    public void enter() {
+        this.runUntil = System.currentTimeMillis() + this.duration;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return System.currentTimeMillis() >= runUntil;
+    }
+
+    @Override
+    public void leave() {}
+}
+
+abstract class TurningState extends State {
+    private Robot robot;
+    private float targetAngle;
+    private float angleDelta;
+
+    public TurningState(float angleDelta, Robot robot){
+        this.angleDelta = angleDelta;
+        this.robot = robot;
+    }
+
+    @Override
+    public void enter() {
+        targetAngle = MathHelpers.piTo2Pi(robot.getGyroHeading() + angleDelta);
+    }
+
+    @Override
+    public boolean isFinished() {
+        float current = robot.getGyroHeading();
+
+        boolean finished = MathHelpers.isInRange2pi(current, this.targetAngle, 2);
+        if (finished) {
+            return true;
+        }
+
+        float phi = Math.abs(this.targetAngle - current) % 360;
+        float error = phi > 180
+                ? (360 - phi) * -1
+                : Math.copySign(phi, targetAngle - current);
+        robot.setDriveInput(0,0, 0);
+        return true;
+    }
+
+    @Override
+    public void leave() {}
+}
