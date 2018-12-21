@@ -1,11 +1,15 @@
 package eaglesfe.roverruckus.opmodes.autonomous;
 
+import android.graphics.Point;
+
 import com.eaglesfe.birdseye.BirdseyeServer;
+import com.eaglesfe.birdseye.roverruckus.MineralSample;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import eaglesfe.common.MathHelpers;
 import eaglesfe.roverruckus.Robot;
@@ -15,16 +19,16 @@ public class CompetitionAutonomous extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        BirdseyeServer      server  =   new BirdseyeServer(3708, telemetry);
-        final Robot         robot   =   new Robot(hardwareMap);
+        final BirdseyeServer    server  =   new BirdseyeServer(3708, telemetry);
+        final Robot             robot   =   new Robot(hardwareMap);
         robot.setVisionEnabled(true);
 
         ArrayList<State> states = new ArrayList<>(Arrays.asList(
 
-                /* Descend from the lander ====================================================== */
+                /* ============================================================================== */
                 new State() {
                     public String getDescription() {
-                       return "Descending from lander...";
+                        return "Descending from lander...";
                     }
 
                     @Override
@@ -38,33 +42,31 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
 
                     @Override
-                    public void leave() {}
+                    public void leave() {
+                    }
                 },
                 /* ============================================================================== */
-
-                /* Scoot ======================================================================== */
-                new TimedState(1000) {
+                new State() {
                     public String getDescription() {
                         return "Scoot away from hook...";
                     }
 
                     @Override
                     public void enter() {
-                        super.enter();
-                        robot.setDriveInput(0.0, -0.25, 0);
+                        robot.moveBackward(5.0, 0.3);
                     }
 
                     @Override
                     public boolean isFinished() {
-                        return super.isFinished();
+                        return !robot.isDriveBusy();
                     }
 
                     @Override
                     public void leave() {
-                        robot.setDriveInput(0,0,0);
+                        robot.setDriveInput(0, 0, 0);
                     }
                 },
-                /* Strafe toward minerals ======================================================= */
+                /* ============================================================================== */
                 new State() {
                     public String getDescription() {
                         return "Strafe toward minerals...";
@@ -72,36 +74,225 @@ public class CompetitionAutonomous extends LinearOpMode {
 
                     @Override
                     public void enter() {
+                        robot.resetGyroHeading();
                         robot.useSideCamera();
-                        robot.setDriveInput(-0.2, 0, 0);
+                        robot.setDriveInput(-0.15, 0, 0);
                     }
 
                     @Override
                     public boolean isFinished() {
-                        return robot.getMineralSample().sampleSize > 0;
+                        MineralSample sample = robot.getMineralSample();
+                        double x, z = 0;
+                        float heading = robot.getGyroHeading180();
+                        if (heading >= 1) {
+                            z = 0.1;
+                        } else if (heading <= -1) {
+                            z = -0.1;
+                        }
+
+                        if (sample.sampleSize > 0) {
+                            double top = sample.silverSampleSize > 0
+                                    ? sample.silverMineralLocations.get(0).y
+                                    : sample.goldMineralLocations.get(0).y;
+
+                            if (top < 20) {
+                                x = -0.15;
+                            } else if (top > 50) {
+                                x = 0.15;
+                            } else {
+                                return true;
+                            }
+                            robot.setDriveInput(x, 0, z);
+
+                        }
+                        return false;
                     }
 
                     @Override
                     public void leave() {
                         robot.setDriveInput(0, 0, 0);
                     }
+
+                    @Override
+                    public int getTimeout() {
+                        return 2500;
+                    }
+                },
+                /* ============================================================================== */
+                new State() {
+                    public String getDescription() {
+                        return "Move to far right of minerals...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveForward(18, 0.4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.setDriveInput(0, 0, 0);
+                    }
+                },
+                /* ============================================================================== */
+                new State() {
+                    public String getDescription() {
+                        return "Scan for gold mineral...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.useSideCamera();
+                        robot.setDriveInput(0, -0.15, 0);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        float heading = robot.getGyroHeading180();
+                        if (heading >= 1) {
+                            robot.setDriveInputZ(0.1);
+                        } else if (heading <= -1) {
+                            robot.setDriveInputZ(-0.1);
+                        } else {
+                            robot.setDriveInputZ(0);
+                        }
+
+                        return robot.getMineralSample().goldSampleSize > 0;
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.setDriveInput(0, 0, 0);
+                    }
+                },
+                /* ============================================================================== */
+                new State() {
+                    public String getDescription() {
+                        return "Position center with mineral...";
+                    }
+
+                    @Override
+                    public void enter() {
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        MineralSample sample = robot.getMineralSample();
+                        if (sample.goldSampleSize == 1 && sample.goldMineralLocations.get(0).x < 35) {
+                            return true;
+                        }
+                        robot.setDriveInput(0, 0.15, 0);
+                        return false;
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.setDriveInput(0, 0, 0);
+                    }
+                },
+                /* ============================================================================== */
+                new TimedState(250) {
+                    @Override
+                    public String getDescription() {
+                        return "Pause to let motion settle...";
+                    }
+                },
+                /* ============================================================================== */
+                new TimedState(1000) {
+
+                    @Override
+                    public String getDescription() {
+                        return "Dislodge gold mineral...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        super.enter();
+                        robot.setDriveInput(-0.5, 0, 0);
+                    }
+
+                    @Override
+                    public void leave() {
+                        super.leave();
+                        robot.setDriveInput(0, 0, 0);
+                    }
+                },
+                new TimedState(250) {
+                    @Override
+                    public String getDescription() {
+                        return "Pause to let motion settle...";
+                    }
+                },
+                new TimedState(1000) {
+
+                    @Override
+                    public String getDescription() {
+                        return "Return to previous position...";
+                    }
+
+                    @Override
+                    public void enter () {
+                        super.enter();
+                        robot.setDriveInput(0.5,0,0);
+                    }
+
+                    @Override
+                    public void leave () {
+                        super.leave();
+                        robot.setDriveInput(0,0,0);
+                    }
+                },
+                new State() {
+                    public String getDescription() {
+                        return "Reset lift...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.setLiftPosition(0.05, 1.0);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isLiftBusy();
+                    }
+
+                    @Override
+                    public void leave() {}
                 }
                 /* ============================================================================== */
-
             )
         );
 
         // =========================================================================================
 
+        robot.useSideCamera();
+        while (!isStarted()) {
+            telemetry.addData("GYRO", robot.getGyroHeading180());
+            telemetry.update();
+        }
         waitForStart();
 
         for (State state : states) {
+            if (!state.isEnabled()) {
+                continue;
+            }
+
+            long timeout = System.currentTimeMillis() + state.getTimeout();
             state.enter();
 
             telemetry.addData("STATE", state.getDescription());
             telemetry.update();
 
-            while(state.isEnabled() && !state.isFinished() && opModeIsActive()) {
+            while(state.isEnabled()
+                    && !state.isFinished()
+                    && opModeIsActive()
+                    && System.currentTimeMillis() < timeout) {
 
             }
 
@@ -111,7 +302,7 @@ public class CompetitionAutonomous extends LinearOpMode {
         // =========================================================================================
 
         while (opModeIsActive()) {}
-        robot.disable();
+        robot.stopAllMotors();
     }
 }
 
@@ -121,6 +312,10 @@ abstract class State {
     public abstract void enter();
     public abstract boolean isFinished();
     public abstract void  leave();
+
+    public int getTimeout() {
+        return 10000;
+    }
 }
 
 abstract class TimedState extends State {
@@ -139,42 +334,6 @@ abstract class TimedState extends State {
     @Override
     public boolean isFinished() {
         return System.currentTimeMillis() >= runUntil;
-    }
-
-    @Override
-    public void leave() {}
-}
-
-abstract class TurningState extends State {
-    private Robot robot;
-    private float targetAngle;
-    private float angleDelta;
-
-    public TurningState(float angleDelta, Robot robot){
-        this.angleDelta = angleDelta;
-        this.robot = robot;
-    }
-
-    @Override
-    public void enter() {
-        targetAngle = MathHelpers.piTo2Pi(robot.getGyroHeading() + angleDelta);
-    }
-
-    @Override
-    public boolean isFinished() {
-        float current = robot.getGyroHeading();
-
-        boolean finished = MathHelpers.isInRange2pi(current, this.targetAngle, 2);
-        if (finished) {
-            return true;
-        }
-
-        float phi = Math.abs(this.targetAngle - current) % 360;
-        float error = phi > 180
-                ? (360 - phi) * -1
-                : Math.copySign(phi, targetAngle - current);
-        robot.setDriveInput(0,0, 0);
-        return true;
     }
 
     @Override

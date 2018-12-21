@@ -43,11 +43,11 @@ public class Robot {
      */
     private void initializeHardware() {
         DcMotor frontLeft = this.hardwareMap.dcMotor.get(Constants.FRONT_LEFT);
-        frontLeft.setDirection(REVERSE);
+        frontLeft.setDirection(FORWARD);
         DcMotor frontRight = this.hardwareMap.dcMotor.get(Constants.FRONT_RIGHT);
         frontRight.setDirection(REVERSE);
         DcMotor backLeft = this.hardwareMap.dcMotor.get(Constants.BACK_LEFT);
-        backLeft.setDirection(REVERSE);
+        backLeft.setDirection(FORWARD);
         DcMotor backRight = this.hardwareMap.dcMotor.get(Constants.BACK_RIGHT);
         backRight.setDirection(REVERSE);
         this.drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
@@ -156,13 +156,17 @@ public class Robot {
 
     private float baseGyroHeading;
 
-    private void resetGyroHeading() {
-        baseGyroHeading = getGyroHeading();
+    public void resetGyroHeading() {
+        baseGyroHeading = getGyroHeading180();
     }
 
-    public float getGyroHeading() {
-        float euler =  imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+    public float getGyroHeading360() {
+        float euler =  getGyroHeading180();
         return MathHelpers.piTo2Pi(euler);
+    }
+
+    public float getGyroHeading180() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - baseGyroHeading;
     }
 
     public boolean isReady() {
@@ -170,7 +174,7 @@ public class Robot {
             && this.imu.isSystemCalibrated();
     }
 
-    public void disable() {
+    public void stopAllMotors() {
         this.setDriveInput(0, 0, 0);
         this.collector.setPower(0);
         this.extend.setPower(0);
@@ -180,8 +184,36 @@ public class Robot {
 
     // =============================================================================================
 
+    private double setX, setY, setZ = 0;
     public void setDriveInput(double x, double y, double z) {
-        this.drive.setInput(x, y, z);
+        setX = x;
+        setY = y;
+        setZ = z;
+        this.drive.setInput(setX, setY, setZ);
+    }
+
+    public void setDriveInputX(double x) {
+        this.drive.setInput(x, setY, setZ);
+    }
+
+    public void setDriveInputY(double y) {
+        this.drive.setInput(setX, y, setZ);
+    }
+
+    public void setDriveInputZ(double z) {
+        this.drive.setInput(setX, setY, z);
+    }
+
+    public void moveForward(double inches, double speed) {
+        this.drive.setForwardTargetPositionRelative(Math.abs(inches), speed);
+    }
+
+    public void moveBackward(double inches, double speed) {
+        this.drive.setForwardTargetPositionRelative(Math.abs(inches) * -1, speed);
+    }
+
+    public boolean isDriveBusy() {
+        return this.drive.isBusy();
     }
 
     // =============================================================================================
