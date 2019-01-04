@@ -249,6 +249,10 @@ public class Robot {
         return collector.getCurrentPosition();
     }
 
+    public boolean isArmBusy() {
+        return collector.isBusy();
+    }
+
     // =============================================================================================
 
     public void setExtendSpeed(double speed) {

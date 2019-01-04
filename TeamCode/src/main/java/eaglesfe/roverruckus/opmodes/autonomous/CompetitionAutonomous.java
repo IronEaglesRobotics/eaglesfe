@@ -26,6 +26,7 @@ public class CompetitionAutonomous extends LinearOpMode {
         ArrayList<State> states = new ArrayList<>(Arrays.asList(
 
                 /* ============================================================================== */
+//                descend from lander
                 new State() {
                     public String getDescription() {
                         return "Descending from lander...";
@@ -46,6 +47,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                scoot from hook
                 new State() {
                     public String getDescription() {
                         return "Scoot away from hook...";
@@ -67,6 +69,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                strafe to minerals
                 new State() {
                     public String getDescription() {
                         return "Strafe toward minerals...";
@@ -119,6 +122,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                move to far right of minerals
                 new State() {
                     public String getDescription() {
                         return "Move to far right of minerals...";
@@ -140,6 +144,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                scan for gold
                 new State() {
                     public String getDescription() {
                         return "Scan for gold mineral...";
@@ -171,6 +176,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                position with center
                 new State() {
                     public String getDescription() {
                         return "Position center with mineral...";
@@ -196,6 +202,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                pause
                 new TimedState(250) {
                     @Override
                     public String getDescription() {
@@ -203,6 +210,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                 },
                 /* ============================================================================== */
+//                dislodge mineral
                 new TimedState(1000) {
 
                     @Override
@@ -222,12 +230,14 @@ public class CompetitionAutonomous extends LinearOpMode {
                         robot.setDriveInput(0, 0, 0);
                     }
                 },
+                //pause
                 new TimedState(250) {
                     @Override
                     public String getDescription() {
                         return "Pause to let motion settle...";
                     }
                 },
+                //its rewind time
                 new TimedState(1000) {
 
                     @Override
@@ -236,17 +246,18 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
 
                     @Override
-                    public void enter () {
+                    public void enter() {
                         super.enter();
-                        robot.setDriveInput(0.5,0,0);
+                        robot.setDriveInput(0.5, 0, 0);
                     }
 
                     @Override
-                    public void leave () {
+                    public void leave() {
                         super.leave();
-                        robot.setDriveInput(0,0,0);
+                        robot.setDriveInput(0, 0, 0);
                     }
                 },
+                //reset lift
                 new State() {
                     public String getDescription() {
                         return "Reset lift...";
@@ -263,13 +274,286 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
 
                     @Override
-                    public void leave() {}
-                }
+                    public void leave() {
+                    }
+                },
                 /* ============================================================================== */
+
+                //TODO
+                /*need to add logic that sets the side and the position of the mineral were moving from*/
+
+                /* ============================================================================== */
+                //states for depot side
+                //move from minerals
+                new State() {
+
+                    @Override
+                    public String getDescription() {
+                        return "moving from minerals...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveBackward(20, .4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.stopAllMotors();
+                    }
+                },
+                //turn to face depot
+                new TimedState(400) {
+                    @Override
+                    public String getDescription() {
+                        return "turning to face depot...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        super.enter();
+                        robot.setDriveInputZ(.4);
+                    }
+
+                    @Override
+                    public void leave() {
+                        super.leave();
+                        robot.stopAllMotors();
+                    }
+                },
+                //move to deopot
+                new State() {
+
+                    @Override
+                    public String getDescription() {
+                        return "moving to depot...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveForward(36, .4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.stopAllMotors();
+                    }
+                },
+                //score marker
+                new State() {
+                    @Override
+                    public String getDescription() {
+                        return "scoring marker...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.setArmPosition(1, .6);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isArmBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                    }
+                },
+                //move to cratrer
+                new State() {
+
+                    @Override
+                    public String getDescription() {
+                        return "moving to crater...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveBackward(36, .4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+
+                    }
+                },
+                //park
+                new State() {
+                    @Override
+                    public String getDescription() {
+                        return "parking...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.collect(true,true);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return false;
+                    }
+
+                    @Override
+                    public void leave() {
+                        //just in case?!>>@?!??
+                        robot.stopAllMotors();
+                    }
+                },
+
+                //states for crater side
+                //move from minerals
+                new State() {
+
+                    @Override
+                    public String getDescription() {
+                        return "moving from minerals...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveBackward(20, .4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.stopAllMotors();
+                    }
+                },
+                //turn to face depot
+                new TimedState(1200) {
+                    @Override
+                    public String getDescription() {
+                        return "turning to face depot...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        super.enter();
+                        robot.setDriveInputZ(-.4);
+                    }
+
+                    @Override
+                    public void leave() {
+                        super.leave();
+                        robot.stopAllMotors();
+                    }
+                },
+                //move to depot
+                new State() {
+
+                    @Override
+                    public String getDescription() {
+                        return "moving to depot...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveForward(36, .4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                        robot.stopAllMotors();
+                    }
+                },
+                //score marker
+                new State() {
+                    @Override
+                    public String getDescription() {
+                        return "scoring marker...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.setArmPosition(1, .6);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isArmBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+                    }
+                },
+                //back to crater
+                new State() {
+
+                    @Override
+                    public String getDescription() {
+                        return "moving to crater...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.moveBackward(60, .4);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return !robot.isDriveBusy();
+                    }
+
+                    @Override
+                    public void leave() {
+
+                    }
+                },
+                //park
+                new State() {
+                    @Override
+                    public String getDescription() {
+                        return "parking...";
+                    }
+
+                    @Override
+                    public void enter() {
+                        robot.collect(true,true);
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return false;
+                    }
+
+                    @Override
+                    public void leave() {
+                        //just in case?!>>@?!??
+                        robot.stopAllMotors();
+                    }
+                }
             )
         );
 
-        // =========================================================================================
+        // =======================================================================================
 
         robot.useSideCamera();
         while (!isStarted()) {
