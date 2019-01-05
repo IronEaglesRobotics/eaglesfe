@@ -179,7 +179,6 @@ public class Robot {
         this.collector.setPower(0);
         this.extend.setPower(0);
         this.lift.setPower(0);
-        this.tracker.stop();
     }
 
     // =============================================================================================
@@ -238,12 +237,13 @@ public class Robot {
     // =============================================================================================
 
     public void setArmSpeed(double speed) {
-        setMotorSpeed(this.collector, speed);
+        this.collector.setPower(speed);
     }
 
-    public void setArmPosition(int position, double speed) {
-        setMotorPosition(this.collector, position, speed);
-    }
+    public void setArmPosition(double position, double speed) {
+        position = Range.clip(position, 0.0, 1.0);
+        int ticks = (int)(position * Constants.MAX_ARM_TICKS);
+        setMotorPosition(this.collector, ticks, speed);    }
 
     public int getArmPosition() {
         return collector.getCurrentPosition();
@@ -277,24 +277,26 @@ public class Robot {
     // =============================================================================================
 
     public class Constants {
-        static final String FRONT_LEFT      = "FrontLeft";
-        static final String FRONT_RIGHT     = "FrontRight";
-        static final String BACK_LEFT       = "BackLeft";
-        static final String BACK_RIGHT      = "BackRight";
-        static final String LIFT            = "Lift";
-        static final String ARM             = "Arm";
-        static final String EXTEND          = "Extend";
-        static final String COLLECT_LEFT    = "CollectorLeft";
-        static final String COLLECT_RIGHT   = "CollectorRight";
-        static final String GYRO            = "IMU";
-        static final String POS_CAM         = "PositionCamera";
-        static final String MINERAL_CAM     = "MineralCamera";
-        static final String VUFORIA_KEY     = "AUmjH6X/////AAABmeSd/rs+aU4giLmf5DG5vUaAfHFLv0/vAnAFxt5vM6cbn1/nI2sdkRSEf6HZLA/is/+VQY5/i6u5fbJ4TugEN8HOxRwvUvkrAeIpgnMYEe3jdD+dPxhE88dB58mlPfVwIPJc2KF4RE7weuRBoZ8KlrEKbNNu20ommdG7S/HXP9Kv/xocj82rgj+iPEaitftALZ6QaGBdfSl3nzVMK8/KgQJNlSbGic/Wf3VI8zcYmMyDslQPK45hZKlHW6ezxdGgJ7VJCax+Of8u/LEwfzqDqBsuS4/moNBJ1mF6reBKe1hIE2ffVTSvKa2t95g7ht3Z4M6yQdsI0ZaJ6AGnl1wTlm8Saoal4zTbm/VCsmZI081h";
-        static final float CAM_X_OFFSET     = -8.0f;
-        static final float CAM_Y_OFFSET     = 0.0f;
-        static final float CAM_Z_OFFSET     = 5.5f;
-        static final int CAM_R_OFFSET       = 0;
+        public static final String FRONT_LEFT      = "FrontLeft";
+        public static final String FRONT_RIGHT     = "FrontRight";
+        public static final String BACK_LEFT       = "BackLeft";
+        public static final String BACK_RIGHT      = "BackRight";
+        public static final String LIFT            = "Lift";
+        public static final String ARM             = "Arm";
+        public static final String EXTEND          = "Extend";
+        public static final String COLLECT_LEFT    = "CollectorLeft";
+        public static final String COLLECT_RIGHT   = "CollectorRight";
+        public static final String GYRO            = "IMU";
+        public static final String POS_CAM         = "PositionCamera";
+        public static final String MINERAL_CAM     = "MineralCamera";
+        public static final String VUFORIA_KEY     = "AUmjH6X/////AAABmeSd/rs+aU4giLmf5DG5vUaAfHFLv0/vAnAFxt5vM6cbn1/nI2sdkRSEf6HZLA/is/+VQY5/i6u5fbJ4TugEN8HOxRwvUvkrAeIpgnMYEe3jdD+dPxhE88dB58mlPfVwIPJc2KF4RE7weuRBoZ8KlrEKbNNu20ommdG7S/HXP9Kv/xocj82rgj+iPEaitftALZ6QaGBdfSl3nzVMK8/KgQJNlSbGic/Wf3VI8zcYmMyDslQPK45hZKlHW6ezxdGgJ7VJCax+Of8u/LEwfzqDqBsuS4/moNBJ1mF6reBKe1hIE2ffVTSvKa2t95g7ht3Z4M6yQdsI0ZaJ6AGnl1wTlm8Saoal4zTbm/VCsmZI081h";
+        public static final float CAM_X_OFFSET     = -8.0f;
+        public static final float CAM_Y_OFFSET     = 0.0f;
+        public static final float CAM_Z_OFFSET     = 5.5f;
+        public static final int CAM_R_OFFSET       = 180;
 
-        static final int MAX_LIFT_TICKS     = 3100;
+        public static final int MAX_LIFT_TICKS     = 3100;
+        public static final int MAX_ARM_TICKS      = -4500;
+        public static final double TEAM_MARKER_DEPLOY = -3000f / MAX_ARM_TICKS;
     }
 }

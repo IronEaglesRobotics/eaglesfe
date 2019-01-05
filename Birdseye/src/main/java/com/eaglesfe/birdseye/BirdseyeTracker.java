@@ -184,7 +184,10 @@ public abstract class BirdseyeTracker
     public FieldPosition getCurrentPosition() throws IllegalStateException {
 
         OpenGLMatrix transformationMatrix = getRobotTransformationMatrix();
-        return new FieldPosition(transformationMatrix);
+        if (transformationMatrix != null) {
+            return new FieldPosition(transformationMatrix);
+        }
+        return null;
     }
 
     public OpenGLMatrix getRobotTransformationMatrix() throws IllegalStateException {

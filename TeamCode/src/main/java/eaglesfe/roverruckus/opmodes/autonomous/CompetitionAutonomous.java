@@ -1,7 +1,9 @@
 package eaglesfe.roverruckus.opmodes.autonomous;
 
 import com.eaglesfe.birdseye.BirdseyeServer;
+import com.eaglesfe.birdseye.FieldPosition;
 import com.eaglesfe.birdseye.roverruckus.MineralSample;
+import com.eaglesfe.birdseye.util.FieldPositionHelpers;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -28,16 +30,27 @@ public class CompetitionAutonomous extends LinearOpMode {
                 },
                 /* ============================================================================== */
                 new Step("Scoot away from hook...") {
-                    public void enter() { robot.moveBackward(5.0, 0.3); }
+                    public void enter() { robot.moveForward(5.0, 0.3); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
+                },
+                /* ============================================================================== */
+                new Step("Quick scoot toward minerals...", 1000) {
+                    public void enter() { robot.setDriveInput(-0.4, 0, 0);}
+                    public boolean isFinished() { return false; }
+                    public void leave() { robot.stopAllMotors(); }
+                },
+                new Step("Pause until sample size is greater than 0...", 3000) {
+                    public void enter() { robot.stopAllMotors(); }
+                    public boolean isFinished() { return robot.getMineralSample().sampleSize > 0; }
+                    public void leave() { robot.stopAllMotors(); }
                 },
                 /* ============================================================================== */
                 new Step("Strafe toward minerals...", 2500) {
                     public void enter() {
                         robot.resetGyroHeading();
                         robot.useSideCamera();
-                        robot.setDriveInput(-0.15, 0, 0);
+                        robot.setDriveInput(-0.1, 0, 0);
                     }
 
                     public boolean isFinished() {
@@ -55,9 +68,9 @@ public class CompetitionAutonomous extends LinearOpMode {
                             double top = sample.boundingBox.top;
 
                             if (top < 20) {
-                                x = -0.15;
+                                x = -0.1;
                             } else if (top > 50) {
-                                x = 0.15;
+                                x = 0.1;
                             } else {
                                 return true;
                             }
@@ -70,7 +83,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                 },
                 /* ============================================================================== */
                 new Step("Move to far right of minerals...") {
-                    public void enter() { robot.moveForward(18, 0.4); }
+                    public void enter() { robot.moveForward(8, 0.4); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
@@ -78,7 +91,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                 new Step("Scan for gold mineral...") {
                     public void enter() {
                         robot.useSideCamera();
-                        robot.setDriveInput(0, -0.15, 0);
+                        robot.setDriveInput(0, -0.1, 0);
                     }
 
                     public boolean isFinished() {
@@ -96,25 +109,11 @@ public class CompetitionAutonomous extends LinearOpMode {
 
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-                /* ============================================================================== */
-                new Step("Position center with mineral...") {
-                    public void enter() { }
 
-                    public boolean isFinished() {
-                        MineralSample sample = robot.getMineralSample();
-                        if (sample.goldSampleSize == 1 && sample.goldMineralLocations.get(0).x < 35) {
-                            return true;
-                        }
-                        robot.setDriveInput(0, 0.15, 0);
-                        return false;
-                    }
-
-                    public void leave() { robot.setDriveInput(0, 0, 0); }
-                },
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
-                new Step("Dislodge gold mineral...", 1000) {
+                new Step("Dislodge gold mineral...", 750) {
                     public void enter() { robot.setDriveInput(-0.5, 0, 0); }
                     public boolean isFinished() { return false; }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
@@ -122,19 +121,108 @@ public class CompetitionAutonomous extends LinearOpMode {
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
-                new Step("Return to previous position...", 1000) {
-
+                new Step("Return to previous position...", 600) {
                     public void enter () { robot.setDriveInput(0.5,0,0); }
                     public boolean isFinished() { return false; }
                     public void leave () { robot.setDriveInput(0,0,0); }
                 },
                 /* ============================================================================== */
-                new Step("Reset lift...") {
-                    public void enter() { robot.setLiftPosition(0.05, 1.0); }
-                    public boolean isFinished() { return !robot.isLiftBusy(); }
-                    public void leave() {}
-                }
+                new Step("Scan for vuforia targets...", 60000) {
+
+                    public void enter () {
+                        robot.useRearCamera();
+
+                        robot.setDriveInput(0,-.1,0);
+                    }
+
+                    public boolean isFinished() {
+                        FieldPosition position = robot.getPosition();
+                        if (position != null) {
+                            return true;
+                        } else {
+                            float heading = robot.getGyroHeading180();
+                            if (heading >= 1) {
+                                robot.setDriveInputZ(0.1);
+                            } else if (heading <= -1) {
+                                robot.setDriveInputZ(-0.1);
+                            } else {
+                                robot.setDriveInputZ(0);
+                            }
+                        }
+                        telemetry.update();
+                        return false;
+                    }
+
+                    public void leave () {
+                        robot.stopAllMotors();
+                    }
+                },
                 /* ============================================================================== */
+                new Step("Move to wall...", 10000) {
+
+                    private double distance = Double.MIN_VALUE;
+                    public void enter() { tryMove(); }
+
+                    private void tryMove() {
+                        FieldPosition position = robot.getPosition();
+                        if (position != null) {
+                            double x = position.getX();
+                            double y = position.getY();
+                            double targetX = -62;
+                            double targetY = 0;
+                            double xPrime = targetX - x;
+                            double yPrime = targetY - y;
+
+                            this.distance = Math.sqrt(Math.pow(xPrime, 2) + Math.pow(yPrime, 2));
+                            robot.moveBackward(this.distance, 0.3);
+                        }
+                    }
+
+                    public boolean isFinished() {
+                        if (distance == Double.MIN_VALUE) {
+                            tryMove();
+                        } else {
+                            return !robot.isDriveBusy();
+                        }
+                        return false;
+                    }
+
+                    public void leave() {
+                        robot.stopAllMotors();
+                    }
+                },
+                /* ============================================================================== */
+                new Step("Turn to face the depot...", 10000) {
+
+                    public void enter() { robot.resetGyroHeading(); }
+
+                    public boolean isFinished() {
+                        if (robot.getGyroHeading180() < -110) {
+                            return true;
+                        }
+
+                        robot.setDriveInput(0,0, 0.4);
+                        return false;
+                    }
+
+                    public void leave() {
+                        robot.stopAllMotors();
+                    }
+                },
+                new Step("Strafe toward wall to square up...", 1000) {
+                    public void enter() { robot.setDriveInput(0.4, 0, 0);}
+                    public boolean isFinished() { return false; }
+                    public void leave() { robot.stopAllMotors(); }
+                },
+                /* ============================================================================== */
+                new Step("Sceedadle post haste to the depot...") {
+                    public void enter() {
+                        robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
+                        robot.moveBackward(39, 0.6);
+                    }
+                    public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
+                    public void leave() { robot.stopAllMotors();}
+                }
             )
         );
 
