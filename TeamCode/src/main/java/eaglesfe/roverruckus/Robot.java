@@ -267,6 +267,10 @@ public class Robot {
         return extend.getCurrentPosition();
     }
 
+    public boolean isExtendBusy() {
+        return extend.isBusy();
+    }
+
     // =============================================================================================
 
     public void collect(boolean left, boolean right) {
