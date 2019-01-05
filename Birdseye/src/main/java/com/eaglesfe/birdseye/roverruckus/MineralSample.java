@@ -1,6 +1,9 @@
 package com.eaglesfe.birdseye.roverruckus;
 
 import android.graphics.Point;
+import android.graphics.Rect;
+
+import com.vuforia.Rectangle;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -19,15 +22,25 @@ public class MineralSample {
     public int goldSampleSize = 0;
     public int sampleSize = 0;
     public double angleToGoldMineral = Double.MIN_VALUE;
-
+    public Rect boundingBox;
 
     MineralSample(List<Recognition> recognitions) {
+        this.boundingBox = new Rect(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         for (Recognition recognition : recognitions) {
-            int x = (int)((recognition.getLeft() + (recognition.getWidth() / 2)) / recognition.getImageWidth() * 100);
-            int y = (int)((recognition.getTop() + (recognition.getHeight() / 2)) / recognition.getImageHeight() * 100);
-            if (x >= 10 && y >= 10) {
+            float totalWidth = recognition.getImageWidth();
+            float totalHeight = recognition.getImageHeight();
+
+            float left = (recognition.getLeft() / totalWidth) * 100;
+            float right = (recognition.getRight() / totalWidth) * 100;
+            float top = (recognition.getTop() / totalHeight) * 100;
+            float bottom = (recognition.getBottom() / totalHeight) * 100;
+            float width = recognition.getWidth();
+            float height = recognition.getHeight();
+
+            Point position = new Point((int)(left + (width / 2)), (int)(top + (height / 2)));
+
+            if (width > 10 && height > 10) {
                 sampleSize++;
-                Point position = new Point(x, y);
                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                     goldMineralLocations.add(position);
                     goldSampleSize++;
@@ -36,6 +49,11 @@ public class MineralSample {
                     silverMineralLocations.add(position);
                     silverSampleSize++;
                 }
+
+                boundingBox.left = left < boundingBox.left ? (int)left : boundingBox.left;
+                boundingBox.right = right > boundingBox.right ? (int)right : boundingBox.right;
+                boundingBox.top = top < boundingBox.top ? (int)top : boundingBox.top;
+                boundingBox.bottom = bottom > boundingBox.bottom ? (int)bottom : boundingBox.bottom;
             }
         }
 
