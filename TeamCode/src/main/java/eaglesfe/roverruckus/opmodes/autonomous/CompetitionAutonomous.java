@@ -222,6 +222,14 @@ public class CompetitionAutonomous extends LinearOpMode {
                     }
                     public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
                     public void leave() { robot.stopAllMotors();}
+                },
+                /* ============================================================================== */
+                new Step("CRATER!!!") {
+                    public void enter() {
+                        robot.moveForward(48, 0.6);
+                    }
+                    public boolean isFinished() { return !robot.isDriveBusy(); }
+                    public void leave() { robot.stopAllMotors();}
                 }
             )
         );
