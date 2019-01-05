@@ -121,7 +121,7 @@ public class CompetitionAutonomous extends LinearOpMode {
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
-                new Step("Return to previous position...", 600) {
+                new Step("Return to previous position...", 675) {
                     public void enter () { robot.setDriveInput(0.5,0,0); }
                     public boolean isFinished() { return false; }
                     public void leave () { robot.setDriveInput(0,0,0); }
