@@ -1,9 +1,11 @@
 package eaglesfe.roverruckus.opmodes.autonomous;
 
+import android.graphics.Point;
+
 import com.eaglesfe.birdseye.BirdseyeServer;
 import com.eaglesfe.birdseye.FieldPosition;
 import com.eaglesfe.birdseye.roverruckus.MineralSample;
-import com.eaglesfe.birdseye.util.FieldPositionHelpers;
+import com.eaglesfe.birdseye.util.MathHelpers;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import eaglesfe.roverruckus.Robot;
+import eaglesfe.roverruckus.opmodes.OpModeHelpers;
 
 @Autonomous(name="Autonomous", group ="Competition")
 public class CompetitionAutonomous extends LinearOpMode {
@@ -165,15 +168,12 @@ public class CompetitionAutonomous extends LinearOpMode {
 
                     private void tryMove() {
                         FieldPosition position = robot.getPosition();
-                        if (position != null) {
-                            double x = position.getX();
-                            double y = position.getY();
-                            double targetX = -62;
-                            double targetY = 0;
-                            double xPrime = targetX - x;
-                            double yPrime = targetY - y;
 
-                            this.distance = Math.sqrt(Math.pow(xPrime, 2) + Math.pow(yPrime, 2));
+                        if (position != null) {
+                            int x = (int)position.getX();
+                            int y = (int)position.getY();
+                            Point target = OpModeHelpers.getTurnaroundPointForAutonomous(position);
+                            this.distance = MathHelpers.getDistanceBetweenTwoPoints(new Point(x, y), new Point(target.x, target.y));
                             robot.moveBackward(this.distance, 0.3);
                         }
                     }

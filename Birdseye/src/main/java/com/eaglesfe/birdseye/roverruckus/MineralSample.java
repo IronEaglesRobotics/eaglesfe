@@ -25,6 +25,10 @@ public class MineralSample {
     public Rect boundingBox;
 
     MineralSample(List<Recognition> recognitions) {
+        this(recognitions, 0,0,0,0);
+    }
+
+    MineralSample(List<Recognition> recognitions, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
         this.boundingBox = new Rect(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         for (Recognition recognition : recognitions) {
             float totalWidth = recognition.getImageWidth();
@@ -39,7 +43,10 @@ public class MineralSample {
 
             Point position = new Point((int)(left + (width / 2)), (int)(top + (height / 2)));
 
-            if (width > 10 && height > 10) {
+            boolean isWithinPadding = left > paddingLeft && top > paddingTop && right < paddingRight && bottom < paddingBottom;
+            boolean isLargerThanMinimumSize = width > 10 && height < 10;
+
+            if (isLargerThanMinimumSize && isWithinPadding) {
                 sampleSize++;
                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                     goldMineralLocations.add(position);
