@@ -161,7 +161,7 @@ public abstract class BirdseyeTracker
         return getVuforiaParameters(hardwareMap, vuforiaKey, hardwareMap.get(WebcamName.class, webcamName), preview);
     }
 
-            public void start()
+    public void start()
     {
         assertInitialized();
 

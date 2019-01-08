@@ -118,13 +118,12 @@ public class Robot {
             this.tracker = new RoverRuckusBirdseyeTracker();
             this.tracker.setShowCameraPreview(false);
             this.tracker.setVuforiaKey(Constants.VUFORIA_KEY);
-            this.tracker.setWebcamNames(Constants.POS_CAM, Constants.MINERAL_CAM);
+            this.tracker.setWebcamNames(Constants.MINERAL_CAM, Constants.POS_CAM); // Default to mineral cam.
             this.tracker.setCameraForwardOffset(Constants.CAM_X_OFFSET);
             this.tracker.setCameraVerticalOffset(Constants.CAM_Z_OFFSET);
             this.tracker.cameraLeftOffsetMm(Constants.CAM_Y_OFFSET);
             this.tracker.setCameraRotationalOffset(Constants.CAM_R_OFFSET);
             this.tracker.initialize(this.hardwareMap);
-            this.tracker.start();
         } else {
             if (this.tracker != null) {
                 this.tracker.stop();
@@ -134,11 +133,16 @@ public class Robot {
     }
 
     public void useRearCamera() {
-        this.tracker.setActiveWebcam(0);
+        this.tracker.stopMineralTracking();
+        this.tracker.setActiveWebcam(1);
+        this.tracker.start();
+
     }
 
     public void useSideCamera() {
-        this.tracker.setActiveWebcam(1);
+        this.tracker.stop();
+        this.tracker.setActiveWebcam(0);
+        this.tracker.startMineralTracking();
     }
 
     public MineralSample getMineralSample() {
