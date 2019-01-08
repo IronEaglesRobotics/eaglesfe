@@ -19,11 +19,11 @@ public class OpModeHelpers {
             case 0:
                 return new Point(0,58);
             case 1:
-                return new Point(-62,0);
+                return new Point(-58,0);
             case 2:
-                return new Point(0,-62);
+                return new Point(0,-58);
             case 3:
-                return new Point(62,0);
+                return new Point(58,0);
         }
         return new Point((int)robotPosition.getX(), (int)robotPosition.getY());
     }

@@ -94,8 +94,7 @@ public class RoverRuckusBirdseyeTracker extends BirdseyeTracker
         assertInitialized();
         assertTrackingStarted();
 
-        // We apply a recognition padding of 20 on the top so we dont erroneously pick up minerals in the crater.
-        return new MineralSample(tfod.getRecognitions(), 0, 20, 0,0);
+        return new MineralSample(tfod.getRecognitions());
     }
 }
 

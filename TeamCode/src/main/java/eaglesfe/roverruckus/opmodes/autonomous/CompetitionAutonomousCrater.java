@@ -12,11 +12,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import eaglesfe.common.SleepStep;
+import eaglesfe.common.Step;
 import eaglesfe.roverruckus.Robot;
 import eaglesfe.roverruckus.opmodes.OpModeHelpers;
 
-@Autonomous(name="Autonomous", group ="Competition")
-public class CompetitionAutonomous extends LinearOpMode {
+@Autonomous(name="Autonomous Crater", group ="Competition")
+public class CompetitionAutonomousCrater extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -231,11 +233,11 @@ public class CompetitionAutonomous extends LinearOpMode {
                         robot.setExtedPosition(-4000, 1.0);
                     }
                     public boolean isFinished() { return !robot.isDriveBusy()
-                                                      && !robot.isArmBusy()
-                                                      && !robot.isExtendBusy(); }
+                            && !robot.isArmBusy()
+                            && !robot.isExtendBusy(); }
                     public void leave() { robot.stopAllMotors();}
                 }
-            )
+        )
         );
 
         // =========================================================================================
@@ -273,39 +275,4 @@ public class CompetitionAutonomous extends LinearOpMode {
 
         robot.stopAllMotors();
     }
-}
-
-abstract class Step {
-    private final String description;
-    private final int timeout;
-
-    public Step (String description, int timeout) {
-        this.description = description;
-        this.timeout = timeout;
-    }
-
-    public Step (String description) {
-        this.description = description;
-        this.timeout = 10000;
-    }
-
-    public boolean isEnabled() { return true; }
-    public abstract void enter();
-    public abstract boolean isFinished();
-    public abstract void  leave();
-
-    public String getDescription() { return this.description; }
-    public int getTimeout() { return this.timeout; }
-}
-
-class SleepStep extends Step {
-    public SleepStep(String description, int timeout) {
-        super(description, timeout);
-    }
-
-    public void enter() { }
-
-    public boolean isFinished() { return false; }
-
-    public void leave() { }
 }

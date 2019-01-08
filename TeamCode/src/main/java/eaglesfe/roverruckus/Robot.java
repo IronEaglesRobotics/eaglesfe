@@ -116,7 +116,7 @@ public class Robot {
     public void setVisionEnabled(boolean enabled) {
         if (enabled) {
             this.tracker = new RoverRuckusBirdseyeTracker();
-            this.tracker.setShowCameraPreview(true);
+            this.tracker.setShowCameraPreview(false);
             this.tracker.setVuforiaKey(Constants.VUFORIA_KEY);
             this.tracker.setWebcamNames(Constants.POS_CAM, Constants.MINERAL_CAM);
             this.tracker.setCameraForwardOffset(Constants.CAM_X_OFFSET);
