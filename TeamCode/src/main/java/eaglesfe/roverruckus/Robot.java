@@ -305,6 +305,6 @@ public class Robot {
 
         public static final int MAX_LIFT_TICKS     = 3100;
         public static final int MAX_ARM_TICKS      = -4500;
-        public static final double TEAM_MARKER_DEPLOY = -3000f / MAX_ARM_TICKS;
+        public static final double TEAM_MARKER_DEPLOY = -3200f / MAX_ARM_TICKS;
     }
 }
