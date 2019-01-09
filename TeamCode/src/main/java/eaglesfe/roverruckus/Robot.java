@@ -3,7 +3,7 @@ package eaglesfe.roverruckus;
 import com.eaglesfe.birdseye.FieldPosition;
 import com.eaglesfe.birdseye.roverruckus.MineralSample;
 import com.eaglesfe.birdseye.roverruckus.RoverRuckusBirdseyeTracker;
-import com.eaglesfe.birdseye.roverruckus.RoverRuckusBirdseyeTrackerMode;
+import com.eaglesfe.birdseye.roverruckus.RoverRuckusBirdseyeTracker.RoverRuckusBirdseyeTrackerMode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;

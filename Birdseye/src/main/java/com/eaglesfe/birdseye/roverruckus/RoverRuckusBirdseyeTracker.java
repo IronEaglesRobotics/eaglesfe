@@ -125,9 +125,10 @@ public class RoverRuckusBirdseyeTracker extends BirdseyeTracker
             this.start();
         }
     }
+
+    public enum RoverRuckusBirdseyeTrackerMode {
+        POSITION, MINERAL
+    }
 }
 
-public enum RoverRuckusBirdseyeTrackerMode {
-    POSITION, MINERAL
-}
 
