@@ -3,6 +3,7 @@ package eaglesfe.roverruckus;
 import com.eaglesfe.birdseye.FieldPosition;
 import com.eaglesfe.birdseye.roverruckus.MineralSample;
 import com.eaglesfe.birdseye.roverruckus.RoverRuckusBirdseyeTracker;
+import com.eaglesfe.birdseye.roverruckus.RoverRuckusBirdseyeTrackerMode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -133,7 +134,7 @@ public class Robot {
     }
 
     public void useRearCamera() {
-        this.tracker.stopMineralTracking();
+        this.tracker.setMode(RoverRuckusBirdseyeTrackerMode.POSITION);
         this.tracker.setActiveWebcam(1);
         this.tracker.start();
 
@@ -142,7 +143,7 @@ public class Robot {
     public void useSideCamera() {
         this.tracker.stop();
         this.tracker.setActiveWebcam(0);
-        this.tracker.startMineralTracking();
+        this.tracker.setMode(RoverRuckusBirdseyeTrackerMode.MINERAL);
     }
 
     public MineralSample getMineralSample() {

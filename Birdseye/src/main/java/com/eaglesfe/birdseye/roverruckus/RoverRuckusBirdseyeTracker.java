@@ -22,14 +22,30 @@ public class RoverRuckusBirdseyeTracker extends BirdseyeTracker
 {
     private static final float mmTargetHeight   = 6 * VuforiaBase.MM_PER_INCH;          // the height of the center of the target image above the floor
     private TFObjectDetector tfod;
+    private RoverRuckusBirdseyeTrackerMode mode = RoverRuckusBirdseyeTrackerMode.POSITION;
 
-    public void startMineralTracking() {
-        tfod.activate();
+    @Override
+    public void start() {
+        switch(this.mode){
+            case POSITION:
+                super.start();
+                break;
+            case MINERAL:
+                tfod.activate();
+                break;
+        }
     }
 
-    public void stopMineralTracking() {
-        tfod.shutdown();
-    }
+    @Override
+    public void stop() {
+        switch(this.mode){
+            case POSITION:
+                super.stop();
+                break;
+            case MINERAL:
+                tfod.deactivate();
+                break;
+        }    }
 
     @Override
     public void initialize(HardwareMap hardwareMap) {
@@ -88,5 +104,30 @@ public class RoverRuckusBirdseyeTracker extends BirdseyeTracker
 
         return new MineralSample(tfod.getRecognitions());
     }
+
+    public RoverRuckusBirdseyeTrackerMode getMode() {
+        return mode;
+    }
+
+    public void setMode(RoverRuckusBirdseyeTrackerMode mode) {
+        if (mode == this.mode) {
+            return;
+        }
+
+        boolean wasActive = this.isActive;
+        if (isActive) {
+            this.stop();
+        }
+
+        this.mode = mode;
+
+        if (wasActive) {
+            this.start();
+        }
+    }
+}
+
+public enum RoverRuckusBirdseyeTrackerMode {
+    POSITION, MINERAL
 }
 
