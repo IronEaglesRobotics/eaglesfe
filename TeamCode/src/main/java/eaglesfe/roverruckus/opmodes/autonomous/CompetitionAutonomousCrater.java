@@ -3,6 +3,7 @@ package eaglesfe.roverruckus.opmodes.autonomous;
 import com.eaglesfe.birdseye.BirdseyeServer;
 
 import android.graphics.Point;
+import android.graphics.Rect;
 
 import com.eaglesfe.birdseye.BirdseyeServer;
 import com.eaglesfe.birdseye.FieldPosition;
@@ -73,11 +74,12 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                         }
 
                         if (sample.sampleSize > 0) {
-                            double top = sample.boundingBox.top;
+                            Rect boundingBox = sample.boundingBox;
+                            double center = boundingBox.top + (boundingBox.height() / 2);
 
-                            if (top < 10) {
+                            if (center < 10) {
                                 x = -0.1;
-                            } else if (top > 50) {
+                            } else if (center > 50) {
                                 x = 0.1;
                             } else {
                                 return true;
