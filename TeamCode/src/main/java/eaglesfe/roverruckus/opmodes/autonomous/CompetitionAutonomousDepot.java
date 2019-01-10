@@ -3,7 +3,6 @@ package eaglesfe.roverruckus.opmodes.autonomous;
 import com.eaglesfe.birdseye.BirdseyeServer;
 
 import android.graphics.Point;
-import android.graphics.Rect;
 
 import com.eaglesfe.birdseye.BirdseyeServer;
 import com.eaglesfe.birdseye.FieldPosition;
@@ -73,12 +72,11 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                         }
 
                         if (sample.sampleSize > 0) {
-                            Rect boundingBox = sample.boundingBox;
-                            double center = boundingBox.top + (boundingBox.height() / 2);
+                            double top = sample.boundingBox.top;
 
-                            if (center < 10) {
+                            if (top < 10) {
                                 x = -0.1;
-                            } else if (center > 50) {
+                            } else if (top > 50) {
                                 x = 0.1;
                             } else {
                                 return true;
@@ -92,7 +90,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                 },
                 /* ============================================================================== */
                 new Step("Move to far right of minerals...") {
-                    public void enter() { robot.moveForward(8, 0.4); }
+                    public void enter() { robot.moveForward(18, 0.4); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
@@ -213,9 +211,6 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
-                /* ============================================================================== */
-                new SleepStep("Brief pause...", 100) {},
-                /* ============================================================================== */
                 new Step("Strafe toward wall to square up...", 1000) {
                     public void enter() { robot.setDriveInput(0.4, 0, 0);}
                     public boolean isFinished() { return false; }
