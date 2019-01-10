@@ -1,6 +1,9 @@
 package eaglesfe.roverruckus.opmodes.autonomous;
 
+import com.eaglesfe.birdseye.BirdseyeServer;
+
 import android.graphics.Point;
+import android.graphics.Rect;
 
 import com.eaglesfe.birdseye.BirdseyeServer;
 import com.eaglesfe.birdseye.FieldPosition;
@@ -32,10 +35,11 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                     public void enter() { robot.setLiftPosition(1.0, 1.0); }
                     public boolean isFinished() { return !robot.isLiftBusy(); }
                     public void leave() {}
+                    public boolean isEnabled() { return false; }
                 },
                 /* ============================================================================== */
                 new Step("Scoot away from hook...") {
-                    public void enter() { robot.moveForward(5.0, 0.3); }
+                    public void enter() { robot.moveBackward(5.0, 0.3); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
@@ -70,11 +74,12 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                         }
 
                         if (sample.sampleSize > 0) {
-                            double top = sample.boundingBox.top;
+                            Rect boundingBox = sample.boundingBox;
+                            double center = boundingBox.top + (boundingBox.height() / 2);
 
-                            if (top < 20) {
+                            if (center < 10) {
                                 x = -0.1;
-                            } else if (top > 50) {
+                            } else if (center > 50) {
                                 x = 0.1;
                             } else {
                                 return true;
@@ -88,7 +93,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                 },
                 /* ============================================================================== */
                 new Step("Move to far right of minerals...") {
-                    public void enter() { robot.moveForward(8, 0.4); }
+                    public void enter() { robot.moveForward(22, 0.4); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
@@ -114,7 +119,6 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
 
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
@@ -126,7 +130,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
-                new Step("Return to previous position...", 675) {
+                new Step("Return to previous position...", 600) {
                     public void enter () { robot.setDriveInput(0.5,0,0); }
                     public boolean isFinished() { return false; }
                     public void leave () { robot.setDriveInput(0,0,0); }
@@ -136,7 +140,6 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
 
                     public void enter () {
                         robot.useRearCamera();
-
                         robot.setDriveInput(0,-.1,0);
                     }
 
@@ -175,7 +178,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                             int x = (int)position.getX();
                             int y = (int)position.getY();
                             Point target = OpModeHelpers.getTurnaroundPointForAutonomous(position);
-                            this.distance = MathHelpers.getDistanceBetweenTwoPoints(new Point(x, y), new Point(target.x, target.y));
+                            this.distance = MathHelpers.getDistanceBetweenTwoPoints(new Point(target.x, target.y), new Point(x, y));
                             robot.moveBackward(this.distance, 0.3);
                         }
                     }
@@ -199,11 +202,11 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                     public void enter() { robot.resetGyroHeading(); }
 
                     public boolean isFinished() {
-                        if (robot.getGyroHeading180() < -110) {
+                        if (robot.getGyroHeading180() > 40) {
                             return true;
                         }
 
-                        robot.setDriveInput(0,0, 0.4);
+                        robot.setDriveInput(0,0, -0.4);
                         return false;
                     }
 
@@ -211,8 +214,11 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
+                /* ============================================================================== */
+                new SleepStep("Brief pause...", 100) {},
+                /* ============================================================================== */
                 new Step("Strafe toward wall to square up...", 1000) {
-                    public void enter() { robot.setDriveInput(0.4, 0, 0);}
+                    public void enter() { robot.setDriveInput(-0.4, 0, 0);}
                     public boolean isFinished() { return false; }
                     public void leave() { robot.stopAllMotors(); }
                 },
@@ -220,7 +226,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                 new Step("Sceedadle post haste to the depot...") {
                     public void enter() {
                         robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
-                        robot.moveBackward(39, 0.6);
+                        robot.moveBackward(28, 0.6);
                     }
                     public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
                     public void leave() { robot.stopAllMotors();}
@@ -229,7 +235,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                 new Step("CRATER!!!") {
                     public void enter() {
                         robot.setArmPosition(0.25, 1.0);
-                        robot.moveForward(48, 0.6);
+                        robot.moveForward(50, 0.6);
                         robot.setExtedPosition(-4000, 1.0);
                     }
                     public boolean isFinished() { return !robot.isDriveBusy()
@@ -243,6 +249,9 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
         // =========================================================================================
 
         robot.useSideCamera();
+
+        telemetry.addData("Ready...", null);
+        telemetry.update();
 
         waitForStart();
 
@@ -261,7 +270,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                     && !step.isFinished()
                     && opModeIsActive()
                     && System.currentTimeMillis() < timeout) {
-
+                sleep(50);
             }
 
             step.leave();
