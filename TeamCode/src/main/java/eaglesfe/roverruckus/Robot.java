@@ -289,11 +289,11 @@ public class Robot {
         boolean isRightOpen = collectorRight.getPosition() > 0.5;
 
         if (left && !leftLast) {
-            collectorLeft.setPosition(isLeftOpen ? 0.3 : 0.7);
+            collectorLeft.setPosition(isLeftOpen ? 0 : 1);
         }
 
         if (right && !rightLast) {
-            collectorRight.setPosition(isRightOpen ? 0.3 : 0.7);
+            collectorRight.setPosition(isRightOpen ? 0 : 1);
         }
 
         this.leftLast = left;
