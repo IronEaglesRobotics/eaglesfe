@@ -31,6 +31,8 @@ public class Robot {
     private         Servo                           collectorRight;
     private         BNO055IMU                       imu;
     private         boolean                         isInitialized;
+    private         boolean                         leftLast;
+    private         boolean                         rightLast;
 
     public Robot(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -221,6 +223,7 @@ public class Robot {
 
     // =============================================================================================
     public void setLiftSpeed(double speed) {
+        this.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.lift.setPower(speed);
     }
 
@@ -241,6 +244,7 @@ public class Robot {
     // =============================================================================================
 
     public void setArmSpeed(double speed) {
+        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.collector.setPower(speed);
     }
 
@@ -260,6 +264,7 @@ public class Robot {
     // =============================================================================================
 
     public void setExtendSpeed(double speed) {
+        this.extend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         setMotorSpeed(this.extend, speed);
     }
 
@@ -278,8 +283,31 @@ public class Robot {
     // =============================================================================================
 
     public void collect(boolean left, boolean right) {
-        this.collectorLeft.setPosition(left ? 0 : 1);
-        this.collectorRight.setPosition(right ? 0 : 1);
+
+        boolean isLeftOpen = collectorLeft.getPosition() > 0.5;
+        boolean isRightOpen = collectorRight.getPosition() > 0.5;
+
+        if (left && !leftLast) {
+            collectorLeft.setPosition(isLeftOpen ? 0.3 : 0.7);
+        }
+
+        if (right && !rightLast) {
+            collectorRight.setPosition(isRightOpen ? 0.3 : 0.7);
+        }
+
+        this.leftLast = left;
+        this.rightLast = right;
+
+        //this.collectorLeft.setPosition(left ? 0.3 : 0.7);
+        //this.collectorRight.setPosition(right ? 0.3 : 0.7);
+    }
+
+    public double getCollectorLeftPosition(){
+        return this.collectorLeft.getPosition();
+    }
+
+    public double getCollectorRightPosition(){
+        return this.collectorRight.getPosition();
     }
 
     // =============================================================================================
