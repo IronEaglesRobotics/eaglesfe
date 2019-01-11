@@ -30,24 +30,25 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
 
         ArrayList<Step> steps = new ArrayList<>(Arrays.asList(
                 /* ============================================================================== */
-//                new Step("Descending from lander...") {
-//                    public void enter() { robot.setLiftPosition(1.0, 1.0); }
-//                    public boolean isFinished() { return !robot.isLiftBusy(); }
-//                    public void leave() {}
-//                },
+                new Step("Descending from lander...") {
+                    public void enter() { robot.setLiftPosition(0.98, 1.0); }
+                    public boolean isFinished() { return !robot.isLiftBusy(); }
+                    public void leave() {}
+                },
                 /* ============================================================================== */
-                new Step("Scoot away from hook...") {
+                new Step("Scoot away from hook...", 1000) {
                     public void enter() { robot.moveForward(5.0, 0.3); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
                 /* ============================================================================== */
-                new Step("Quick scoot toward minerals...", 900) {
+                new Step("Quick scoot toward minerals...", 1000) {
                     public void enter() { robot.setDriveInput(-0.4, 0, 0);}
                     public boolean isFinished() { return false; }
                     public void leave() { robot.stopAllMotors(); }
                 },
-                new Step("Pause until sample size is greater than 0...", 3000) {
+                /* ============================================================================== */
+                new Step("Pause until sample size is greater than 0...", 2000) {
                     public void enter() { robot.stopAllMotors(); }
                     public boolean isFinished() { return robot.getMineralSample().sampleSize > 0; }
                     public void leave() { robot.stopAllMotors(); }
@@ -55,7 +56,6 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                 /* ============================================================================== */
                 new Step("Strafe toward minerals...", 2500) {
                     public void enter() {
-                        robot.resetGyroHeading();
                         robot.useSideCamera();
                         robot.setDriveInput(-0.1, 0, 0);
                     }
@@ -117,6 +117,12 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
                 /* ============================================================================== */
+                new Step("Move back just a little bit...") {
+                    public void enter() { robot.moveForward(2, 0.2); }
+                    public boolean isFinished() { return !robot.isDriveBusy(); }
+                    public void leave() { robot.stopAllMotors();}
+                },
+                /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
                 new Step("Dislodge gold mineral...", 750) {
@@ -127,7 +133,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
-                new Step("Return to previous position...", 600) {
+                new Step("Return to previous position...", 750) {
                     public void enter () { robot.setDriveInput(0.5,0,0); }
                     public boolean isFinished() { return false; }
                     public void leave () { robot.setDriveInput(0,0,0); }

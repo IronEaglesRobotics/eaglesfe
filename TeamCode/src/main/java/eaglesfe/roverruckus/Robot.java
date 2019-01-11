@@ -31,8 +31,6 @@ public class Robot {
     private         Servo                           collectorRight;
     private         BNO055IMU                       imu;
     private         boolean                         isInitialized;
-    private         boolean                         leftLast;
-    private         boolean                         rightLast;
 
     public Robot(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -198,15 +196,15 @@ public class Robot {
     }
 
     public void setDriveInputX(double x) {
-        this.drive.setInput(x, setY, setZ);
+        this.setDriveInput(x, setY, setZ);
     }
 
     public void setDriveInputY(double y) {
-        this.drive.setInput(setX, y, setZ);
+        this.setDriveInput(setX, y, setZ);
     }
 
     public void setDriveInputZ(double z) {
-        this.drive.setInput(setX, setY, z);
+        this.setDriveInput(setX, setY, z);
     }
 
     public void moveForward(double inches, double speed) {
@@ -283,23 +281,8 @@ public class Robot {
     // =============================================================================================
 
     public void collect(boolean left, boolean right) {
-
-        boolean isLeftOpen = collectorLeft.getPosition() > 0.5;
-        boolean isRightOpen = collectorRight.getPosition() > 0.5;
-
-        if (left && !leftLast) {
-            collectorLeft.setPosition(isLeftOpen ? 0 : 1);
-        }
-
-        if (right && !rightLast) {
-            collectorRight.setPosition(isRightOpen ? 0 : 1);
-        }
-
-        this.leftLast = left;
-        this.rightLast = right;
-
-        //this.collectorLeft.setPosition(left ? 0.3 : 0.7);
-        //this.collectorRight.setPosition(right ? 0.3 : 0.7);
+        this.collectorLeft.setPosition(left ? 0 : 1);
+        this.collectorRight.setPosition(right ? 0 : 1);
     }
 
     public double getCollectorLeftPosition(){
@@ -333,6 +316,6 @@ public class Robot {
 
         public static final int MAX_LIFT_TICKS     = 3100;
         public static final int MAX_ARM_TICKS      = -4500;
-        public static final double TEAM_MARKER_DEPLOY = -3000f / MAX_ARM_TICKS;
+        public static final double TEAM_MARKER_DEPLOY = -2500f / MAX_ARM_TICKS;
     }
 }
