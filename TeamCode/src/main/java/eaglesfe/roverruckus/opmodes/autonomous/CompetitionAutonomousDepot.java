@@ -217,6 +217,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
+                /* ============================================================================== */
                 new Step("Strafe toward wall to square up...", 1000) {
                     public void enter() { robot.setDriveInput(0.4, 0, 0);}
                     public boolean isFinished() { return false; }

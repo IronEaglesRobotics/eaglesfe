@@ -114,7 +114,6 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
 
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-
                 /* ============================================================================== */
                 new SleepStep("Pause to let motion settle...", 250),
                 /* ============================================================================== */
@@ -210,6 +209,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
+                /* ============================================================================== */
                 new Step("Strafe toward wall to square up...", 1000) {
                     public void enter() { robot.setDriveInput(-0.4, 0, 0);}
                     public boolean isFinished() { return false; }
