@@ -2,10 +2,6 @@ package eaglesfe.roverruckus.opmodes.teleop;
         import com.qualcomm.robotcore.eventloop.opmode.OpMode;
         import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-        import org.firstinspires.ftc.robotcore.internal.opengl.models.Geometry;
-
-        import eaglesfe.roverruckus.IronEaglesRobotRoverRuckus;
-        import eaglesfe.roverruckus.opmodes.RoverRuckusBirdseyeTeleop;
         import eaglesfe.roverruckus.Robot;
 
 @TeleOp(name="TeleOp", group ="Competition")
