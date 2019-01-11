@@ -263,7 +263,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
                     && !step.isFinished()
                     && opModeIsActive()
                     && System.currentTimeMillis() < timeout) {
-
+                sleep(50);
             }
 
             step.leave();
