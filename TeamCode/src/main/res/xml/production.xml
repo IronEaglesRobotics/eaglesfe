@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <!-- Cameras -->
+    <Webcam name="PositionCamera" serialNumber="4915BE5F" />
+    <Webcam name="MineralCamera" serialNumber="A8A9BB5F" />
+
+    <LynxUsbDevice name="Expansion Hubs" serialNumber="DQ16PS9N" parentModuleAddress="1">
+        <LynxModule name="Hub 1 - Drive" port="1">
+            <!-- Drive Motors -->
+            <NeveRest20Gearmotor name="BackLeft" port="0" />
+            <NeveRest20Gearmotor name="BackRight" port="1" />
+            <NeveRest20Gearmotor name="FrontLeft" port="2" />
+            <NeveRest20Gearmotor name="FrontRight" port="3" />
+            <LynxEmbeddedIMU name="IMU" port="0" bus="0" />
+        </LynxModule>
+        <LynxModule name="Hub 2 - Actuators" port="2">
+            <!-- Lift -->
+            <NeveRest3.7v1Gearmotor name="Lift" port="0" />
+
+            <!-- Collector -->
+            <NeveRest20Gearmotor name="Extend" port="2" />
+            <NeveRest3.7v1Gearmotor name="Arm" port="3" />
+            <Servo name="CollectorLeft" port="0" />
+            <Servo name="CollectorRight" port="1" />
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>

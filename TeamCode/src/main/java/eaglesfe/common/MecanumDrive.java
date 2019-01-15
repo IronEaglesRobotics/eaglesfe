@@ -1,91 +1,113 @@
 package eaglesfe.common;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
-public class MecanumDrive {
+import static com.qualcomm.robotcore.hardware.DcMotor.*;
 
+public class MecanumDrive implements DriveBase {
+
+    private final double wheelDiameter = 4.0;
+    private final double wheelCircumference = Math.PI * wheelDiameter;
+    private final double ticksPerRev;
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-    private BNO055IMU internalGyro;
 
-    public MecanumDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight, BNO055IMU internalGyro){
+    public MecanumDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight){
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.backLeft = backLeft;
         this.backRight = backRight;
-        this.internalGyro = internalGyro;
 
-        this.frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.ticksPerRev = this.frontLeft.getMotorType().getTicksPerRev();
 
-        this.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        this.setRunMode(RunMode.RUN_USING_ENCODER);
+        this.setBrakeMode(ZeroPowerBehavior.BRAKE);
     }
 
-    public void updateMotors(double x, double y, double z){
+    public boolean isBusy() {
+        return this.getRunMode() != RunMode.RUN_TO_POSITION
+                || this.frontLeft.isBusy()
+                || this.frontRight.isBusy()
+                || this.backLeft.isBusy()
+                || this.backRight.isBusy();
+    }
+
+    public void setForwardTargetPositionRelative(double inches, double speed) {
+        int ticks = (int)((inches / wheelCircumference) * 560);
+        this.setRunMode(RunMode.STOP_AND_RESET_ENCODER);
+        this.setRunMode(RunMode.RUN_TO_POSITION);
+
+        this.frontLeft.setTargetPosition(ticks);
+        this.frontRight.setTargetPosition(ticks);
+        this.backLeft.setTargetPosition(ticks);
+        this.backRight.setTargetPosition(ticks);
+
+        this.setPower(speed);
+    }
+
+    public void setPower(double power) {
+        this.frontLeft.setPower(power);
+        this.frontRight.setPower(power);
+        this.backLeft.setPower(power);
+        this.backRight.setPower(power);
+    }
+
+    @Override
+    public void setRunMode(RunMode runMode) {
+        this.frontLeft.setMode(runMode);
+        this.frontRight.setMode(runMode);
+        this.backLeft.setMode(runMode);
+        this.backRight.setMode(runMode);
+    }
+
+    public RunMode getRunMode() {
+        return this.frontLeft.getMode();
+    }
+
+    @Override
+    public void setBrakeMode(ZeroPowerBehavior brakeMode) {
+        this.frontLeft.setZeroPowerBehavior(brakeMode);
+        this.frontRight.setZeroPowerBehavior(brakeMode);
+        this.backLeft.setZeroPowerBehavior(brakeMode);
+        this.backRight.setZeroPowerBehavior(brakeMode);
+    }
+
+    @Override
+    public void setInputVector(VectorF vector) {
+        if (vector.length() >= 3) {
+            setInput(vector.get(0), vector.get(1), vector.get(2));
+        } else if (vector.length() >= 2) {
+            setInput(vector.get(0), vector.get(1), 0);
+        } else {
+            setInput(vector.get(0), 0, 0);
+        }
+    }
+
+    @Override
+    public void setInput(double x, double y, double z) {
+        this.setRunMode(RunMode.RUN_USING_ENCODER);
 
         double flPower, frPower, blPower, brPower;
 
-        flPower = z + x - y;
-        frPower = z + x + y;
-        blPower = -z + x + y;
-        brPower = -z + x - y;
+        flPower = z + x + y;    frPower = -z - x + y;
+        blPower = z - x + y;    brPower = -z + x + y;
 
         double max = (Math.abs(z) + Math.abs(y) + Math.abs(x));
 
         if (max < 1) {
-            flPower /= 1;
-            frPower /= 1;
-            blPower /= 1;
-            brPower /= 1;
+            flPower /= 1;   frPower /= 1;
+            blPower /= 1;   brPower /= 1;
         } else {
-            flPower /= max;
-            frPower /= max;
-            blPower /= max;
-            brPower /= max;
+            flPower /= max; frPower /= max;
+            blPower /= max; brPower /= max;
         }
 
-        frontLeft.setPower(flPower);
-        frontRight.setPower(frPower);
-        backLeft.setPower(blPower);
-        backRight.setPower(brPower);
+        frontLeft.setPower(flPower);    frontRight.setPower(frPower);
+        backLeft.setPower(blPower);     backRight.setPower(brPower);
 
-    }
-
-    public void updateDriveTime(double powerx,double powery,double powerz, long millis, long tStart) {
-
-        while (System.currentTimeMillis() - tStart <= millis) {
-            updateMotors(powerx, powery, powerz);
-        }
-
-        updateMotors(0,0,0);
-    }
-
-    public void updateDriveGyro(double powerz, float rStart, float rTarget, OpMode opMode) {
-        rTarget = (float) Math.toRadians(rTarget);
-        float angleDistance = Math.abs(rTarget - internalGyro.getAngularOrientation().firstAngle);
-        while (Math.abs(internalGyro.getAngularOrientation().firstAngle - rStart) < angleDistance) {
-            updateMotors(0,0,powerz);
-            opMode.telemetry.addData("angle", internalGyro.getAngularOrientation().firstAngle);
-            opMode.telemetry.addData("angle", internalGyro.getAngularOrientation().secondAngle);
-            opMode.telemetry.addData("angle", internalGyro.getAngularOrientation().thirdAngle);
-            opMode.telemetry.update();
-        }
-        updateMotors(0,0,0);
-    }
-
-    public float getCurrentAngle() {
-        return internalGyro.getAngularOrientation().firstAngle;
     }
 }

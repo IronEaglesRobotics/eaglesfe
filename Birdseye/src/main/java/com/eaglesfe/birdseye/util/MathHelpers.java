@@ -1,6 +1,8 @@
-package eaglesfe.common;
+package com.eaglesfe.birdseye.util;
 
 import android.graphics.Point;
+
+import static java.lang.Double.NaN;
 
 public class MathHelpers {
 
@@ -18,16 +20,20 @@ public class MathHelpers {
         return  (inRads >= 0 ? inRads : inRads + (2 * Math.PI)) * 180 / Math.PI;
     }
 
-    public static float piTo2Pi(float angle) {
-        return (angle + 360) % 360;
+    public static double max(double ...values) {
+        double max = NaN;
+        for (int i = 0; i < values.length; i++) {
+            max = values[i] > max ? values[i] : max;
+        }
+        return max;
     }
 
-    public static boolean isInRange2pi(float angle, float target, float window) {
-        float min = piTo2Pi(target - window);
-        float max = piTo2Pi(target + window);
-        angle = piTo2Pi(angle);
-
-        return angle > min && angle < max;
+    public static double min(double ...values) {
+        double min = NaN;
+        for (int i = 0; i < values.length; i++) {
+            min = values[i] > min ? values[i] : min;
+        }
+        return min;
     }
 }
 

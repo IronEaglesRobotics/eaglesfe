@@ -1,13 +1,13 @@
-package eaglesfe.common;
+        package eaglesfe.common;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import  com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
+        import com.qualcomm.robotcore.hardware.ColorSensor;
+        import  com.qualcomm.robotcore.hardware.DcMotor;
+        import com.qualcomm.robotcore.hardware.DcMotorSimple;
+        import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+        import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import javax.xml.transform.dom.DOMLocator;
+        import javax.xml.transform.dom.DOMLocator;
 
 public class Arms {
 
@@ -105,4 +105,3 @@ public class Arms {
         return String.format("%d %d %d", sample.red(), sample.green(), sample.blue());
     }
 }
-
