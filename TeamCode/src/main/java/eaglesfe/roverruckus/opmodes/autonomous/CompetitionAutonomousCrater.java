@@ -11,9 +11,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import eaglesfe.common.SleepStep;
 import eaglesfe.common.Step;
+import eaglesfe.common.Steps;
 import eaglesfe.roverruckus.Robot;
 import eaglesfe.roverruckus.opmodes.OpModeHelpers;
 
@@ -26,220 +29,254 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
         final Robot             robot   =   new Robot(hardwareMap);
         robot.setVisionEnabled(true);
 
-        ArrayList<Step> steps = new ArrayList<>(Arrays.asList(
-                /* ============================================================================== */
-                new Step("Descending from lander...") {
-                    public void enter() { robot.setLiftPosition(1.0, 1.0); }
-                    public boolean isFinished() { return !robot.isLiftBusy(); }
-                    public void leave() {}
-                },
-                /* ============================================================================== */
-                new Step("Scoot away from hook...", 1000) {
-                    public void enter() { robot.moveBackward(5.0, 0.3); }
-                    public boolean isFinished() { return !robot.isDriveBusy(); }
-                    public void leave() { robot.setDriveInput(0, 0, 0); }
-                },
-                /* ============================================================================== */
-                new Step("Quick scoot toward minerals...", 1000) {
-                    public void enter() { robot.setDriveInput(-0.4, 0, 0);}
-                    public boolean isFinished() { return false; }
-                    public void leave() { robot.stopAllMotors(); }
-                },
-                /* ============================================================================== */
-                new Step("Pause until sample size is greater than 0...", 2000) {
-                    public void enter() { robot.stopAllMotors(); }
-                    public boolean isFinished() { return robot.getMineralSample().sampleSize > 0; }
-                    public void leave() { robot.stopAllMotors(); }
-                },
-                /* ============================================================================== */
-                new Step("Strafe toward minerals...", 2500) {
-                    public void enter() {
-                        robot.useSideCamera();
-                        robot.setDriveInput(-0.1, 0, 0);
-                    }
+        Map<String, Step> steps = new HashMap<>();
 
-                    public boolean isFinished() {
-                        MineralSample sample = robot.getMineralSample();
-                        float heading = robot.getGyroHeading180();
+        steps.put("start", new Step("Descending from lander...") {
+            public void enter() { robot.setLiftPosition(1.0, 1.0); }
+            public boolean isFinished() { return !robot.isLiftBusy(); }
+            public String leave() { return "scoot_away_from_hook"; }
+        });
 
-                        double x, z = 0;
-                        if (heading >= 1) {
-                            z = 0.1;
-                        } else if (heading <= -1) {
-                            z = -0.1;
-                        }
+        steps.put("scoot_away_from_hook", new Step("Scoot away from hook...", 1000) {
+            public void enter() { robot.moveBackward(5.0, 0.3); }
+            public boolean isFinished() { return !robot.isDriveBusy(); }
+            public String leave() {
+                robot.setDriveInput(0, 0, 0);
+                return "scoot_toward_minerals";
+            }
+        });
 
-                        if (sample.sampleSize > 0) {
-                            double center = sample.boundingBox.top + (sample.boundingBox.height() / 2);
+        steps.put("scoot_toward_minerals", new Step("Quick scoot toward minerals...", 1000) {
+            public void enter() { robot.setDriveInput(-0.4, 0, 0);}
+            public boolean isFinished() { return false; }
+            public String leave() {
+                robot.stopAllMotors();
+                return "pause_for_sample";
+            }
+        });
 
-                            if (center < 10) {
-                                x = -0.1;
-                            } else if (center > 50) {
-                                x = 0.1;
-                            } else {
-                                return true;
-                            }
-                            robot.setDriveInput(x, 0, z);
-                        }
-                        return false;
-                    }
+        steps.put("pause_for_sample", new Step("Pause until sample size is greater than 0...", 2000) {
+            public void enter() { robot.stopAllMotors(); }
+            public boolean isFinished() { return robot.getMineralSample().sampleSize > 0; }
+            public String leave() {
+                robot.stopAllMotors();
+                return "strafe_toward_minerals";
+            }
+        });
 
-                    public void leave() { robot.setDriveInput(0, 0, 0); }
-                },
-                /* ============================================================================== */
-                new Step("Move to far right of minerals...") {
-                    public void enter() { robot.moveForward(22, 0.4); }
-                    public boolean isFinished() { return !robot.isDriveBusy(); }
-                    public void leave() { robot.setDriveInput(0, 0, 0); }
-                },
-                /* ============================================================================== */
-                new Step("Scan for gold mineral...") {
-                    public void enter() {
-                        robot.useSideCamera();
-                        robot.setDriveInput(0, -0.1, 0);
-                    }
+        steps.put("strafe_toward_minerals", new Step("Strafe toward minerals...", 2500) {
+            public void enter() {
+                robot.useSideCamera();
+                robot.setDriveInput(-0.1, 0, 0);
+            }
 
-                    public boolean isFinished() {
-                        float heading = robot.getGyroHeading180();
-                        if (heading >= 1) {
-                            robot.setDriveInputZ(0.1);
-                        } else if (heading <= -1) {
-                            robot.setDriveInputZ(-0.1);
-                        } else {
-                            robot.setDriveInputZ(0);
-                        }
+            public boolean isFinished() {
+                MineralSample sample = robot.getMineralSample();
+                float heading = robot.getGyroHeading180();
 
-                        return robot.getMineralSample().goldSampleSize > 0;
-                    }
-
-                    public void leave() { robot.setDriveInput(0, 0, 0); }
-                },
-                /* ============================================================================== */
-                new SleepStep("Pause to let motion settle...", 250),
-                /* ============================================================================== */
-                new Step("Dislodge gold mineral...", 750) {
-                    public void enter() { robot.setDriveInput(-0.5, 0, 0); }
-                    public boolean isFinished() { return false; }
-                    public void leave() { robot.setDriveInput(0, 0, 0); }
-                },
-                /* ============================================================================== */
-                new SleepStep("Pause to let motion settle...", 250),
-                /* ============================================================================== */
-                new Step("Return to previous position...", 600) {
-                    public void enter () { robot.setDriveInput(0.5,0,0); }
-                    public boolean isFinished() { return false; }
-                    public void leave () { robot.setDriveInput(0,0,0); }
-                },
-                /* ============================================================================== */
-                new Step("Scan for vuforia targets...", 60000) {
-
-                    public void enter () {
-                        robot.useRearCamera();
-                        robot.setDriveInput(0,-.1,0);
-                    }
-
-                    public boolean isFinished() {
-                        FieldPosition position = robot.getPosition();
-                        if (position != null) {
-                            return true;
-                        } else {
-                            float heading = robot.getGyroHeading180();
-                            if (heading >= 1) {
-                                robot.setDriveInputZ(0.1);
-                            } else if (heading <= -1) {
-                                robot.setDriveInputZ(-0.1);
-                            } else {
-                                robot.setDriveInputZ(0);
-                            }
-                        }
-                        telemetry.update();
-                        return false;
-                    }
-
-                    public void leave () {
-                        robot.stopAllMotors();
-                    }
-                },
-                /* ============================================================================== */
-                new Step("Move to wall...", 10000) {
-
-                    private double distance = Double.MIN_VALUE;
-                    public void enter() { tryMove(); }
-
-                    private void tryMove() {
-                        FieldPosition position = robot.getPosition();
-
-                        if (position != null) {
-                            int x = (int)position.getX();
-                            int y = (int)position.getY();
-                            Point target = OpModeHelpers.getTurnaroundPointForAutonomous(position);
-                            this.distance = MathHelpers.getDistanceBetweenTwoPoints(new Point(target.x, target.y), new Point(x, y));
-                            robot.moveBackward(this.distance, 0.3);
-                        }
-                    }
-
-                    public boolean isFinished() {
-                        if (distance == Double.MIN_VALUE) {
-                            tryMove();
-                        } else {
-                            return !robot.isDriveBusy();
-                        }
-                        return false;
-                    }
-
-                    public void leave() {
-                        robot.stopAllMotors();
-                    }
-                },
-                /* ============================================================================== */
-                new Step("Turn to face the depot...", 10000) {
-
-                    public void enter() { robot.resetGyroHeading(); }
-
-                    public boolean isFinished() {
-                        if (robot.getGyroHeading180() > 40) {
-                            return true;
-                        }
-
-                        robot.setDriveInput(0,0, -0.4);
-                        return false;
-                    }
-
-                    public void leave() {
-                        robot.stopAllMotors();
-                    }
-                },
-                /* ============================================================================== */
-                new Step("Strafe toward wall to square up...", 1000) {
-                    public void enter() { robot.setDriveInput(-0.4, 0, 0);}
-                    public boolean isFinished() { return false; }
-                    public void leave() { robot.stopAllMotors(); }
-                },
-                /* ============================================================================== */
-                new Step("Sceedadle post haste to the depot...") {
-                    public void enter() {
-                        robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
-                        robot.moveBackward(28, 0.6);
-                    }
-                    public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
-                    public void leave() { robot.stopAllMotors();}
-                },
-                /* ============================================================================== */
-                new Step("CRATER!!!") {
-                    public void enter() {
-                        robot.setArmPosition(0.25, 1.0);
-                        robot.moveForward(50, 0.6);
-                        robot.setExtedPosition(-4000, 1.0);
-                    }
-                    public boolean isFinished() { return !robot.isDriveBusy()
-                            && !robot.isArmBusy()
-                            && !robot.isExtendBusy(); }
-                    public void leave() { robot.stopAllMotors();}
+                double x, z = 0;
+                if (heading >= 1) {
+                    z = 0.1;
+                } else if (heading <= -1) {
+                    z = -0.1;
                 }
-            )
-        );
 
-        // =========================================================================================
+                if (sample.sampleSize > 0) {
+                    double center = sample.boundingBox.top + (sample.boundingBox.height() / 2);
+
+                    if (center < 10) {
+                        x = -0.1;
+                    } else if (center > 50) {
+                        x = 0.1;
+                    } else {
+                        return true;
+                    }
+                    robot.setDriveInput(x, 0, z);
+                }
+                return false;
+            }
+
+            public String leave() {
+                robot.setDriveInput(0, 0, 0);
+                return "move_to_right_of_minerals";
+            }
+        });
+
+        steps.put("move_to_right_of_minerals", new Step("Move to far right of minerals...") {
+            public void enter() { robot.moveForward(22, 0.4); }
+            public boolean isFinished() { return !robot.isDriveBusy(); }
+            public String leave() {
+                robot.setDriveInput(0, 0, 0);
+                return "scan_for_gold";
+            }
+        });
+
+        steps.put("scan_for_gold", new Step("Scan for gold mineral...") {
+            public void enter() {
+                robot.useSideCamera();
+                robot.setDriveInput(0, -0.1, 0);
+            }
+
+            public boolean isFinished() {
+                float heading = robot.getGyroHeading180();
+                if (heading >= 1) {
+                    robot.setDriveInputZ(0.1);
+                } else if (heading <= -1) {
+                    robot.setDriveInputZ(-0.1);
+                } else {
+                    robot.setDriveInputZ(0);
+                }
+
+                return robot.getMineralSample().goldSampleSize > 0;
+            }
+
+            public String leave() {
+                robot.setDriveInput(0, 0, 0);
+                return "sleep_to_settle_before_sample";
+            }
+        });
+
+        steps.put("sleep_to_settle_before_sample", new SleepStep("Pause to let motion settle...",
+                250, "dislodge_gold_mineral"));
+
+        steps.put("dislodge_gold_mineral", new Step("Dislodge gold mineral...", 750) {
+            public void enter() { robot.setDriveInput(-0.5, 0, 0); }
+            public boolean isFinished() { return false; }
+            public String leave() {
+                robot.setDriveInput(0, 0, 0);
+                return "sleep_to_settle_after_sample";
+            }
+        });
+
+        steps.put("sleep_to_settle_after_sample", new SleepStep("Pause to let motion settle...",
+                250, "return_to_previous_position"));
+
+        steps.put("return_to_previous_position", new Step("Return to previous position...", 600) {
+            public void enter () { robot.setDriveInput(0.5,0,0); }
+            public boolean isFinished() { return false; }
+            public String leave () {
+                robot.setDriveInput(0,0,0);
+                return "scan_for_vuforia_targets";
+            }
+        });
+
+        steps.put("scan_for_vuforia_targets", new Step("Scan for vuforia targets...", 60000) {
+
+            public void enter () {
+                robot.useRearCamera();
+                robot.setDriveInput(0,-.1,0);
+            }
+
+            public boolean isFinished() {
+                FieldPosition position = robot.getPosition();
+                if (position != null) {
+                    return true;
+                } else {
+                    float heading = robot.getGyroHeading180();
+                    if (heading >= 1) {
+                        robot.setDriveInputZ(0.1);
+                    } else if (heading <= -1) {
+                        robot.setDriveInputZ(-0.1);
+                    } else {
+                        robot.setDriveInputZ(0);
+                    }
+                }
+                telemetry.update();
+                return false;
+            }
+
+            public String leave () {
+                robot.stopAllMotors();
+                return "move_to_wall";
+            }
+        });
+
+        steps.put("move_to_wall", new Step("Move to wall...", 10000) {
+
+            private double distance = Double.MIN_VALUE;
+            public void enter() { tryMove(); }
+
+            private void tryMove() {
+                FieldPosition position = robot.getPosition();
+
+                if (position != null) {
+                    int x = (int)position.getX();
+                    int y = (int)position.getY();
+                    Point target = OpModeHelpers.getTurnaroundPointForAutonomous(position);
+                    this.distance = MathHelpers.getDistanceBetweenTwoPoints(new Point(target.x, target.y), new Point(x, y));
+                    robot.moveBackward(this.distance, 0.3);
+                }
+            }
+
+            public boolean isFinished() {
+                if (distance == Double.MIN_VALUE) {
+                    tryMove();
+                } else {
+                    return !robot.isDriveBusy();
+                }
+                return false;
+            }
+
+            public String leave() {
+                robot.stopAllMotors();
+                return "turn_to_face_depot";
+            }
+        });
+
+        steps.put("turn_to_face_depot", new Step("Turn to face the depot...", 10000) {
+
+            public void enter() { robot.resetGyroHeading(); }
+
+            public boolean isFinished() {
+                if (robot.getGyroHeading180() > 40) {
+                    return true;
+                }
+
+                robot.setDriveInput(0,0, -0.4);
+                return false;
+            }
+
+            public String leave() {
+                robot.stopAllMotors();
+                return "strafe_toward_wall";
+            }
+        });
+
+        steps.put("strafe_toward_wall", new Step("Strafe toward wall to square up...", 1000) {
+            public void enter() { robot.setDriveInput(-0.4, 0, 0);}
+            public boolean isFinished() { return false; }
+            public String leave() {
+                robot.stopAllMotors();
+                return "skedaddle";
+            }
+        });
+
+        steps.put("skedaddle", new Step("Skedaddle post haste to the depot...") {
+            public void enter() {
+                robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
+                robot.moveBackward(28, 0.6);
+            }
+            public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
+            public String leave() {
+                robot.stopAllMotors();
+                return "crater";
+            }
+        });
+
+        steps.put("crater", new Step("CRATER!!!") {
+            public void enter() {
+                robot.setArmPosition(0.25, 1.0);
+                robot.moveForward(50, 0.6);
+                robot.setExtedPosition(-4000, 1.0);
+            }
+            public boolean isFinished() { return !robot.isDriveBusy()
+                    && !robot.isArmBusy()
+                    && !robot.isExtendBusy(); }
+            public String leave() {
+                robot.stopAllMotors();
+                return null;
+            }
+        });
 
         robot.useSideCamera();
 
@@ -248,30 +285,8 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
 
         waitForStart();
 
-        for (Step step : steps) {
-            if (!step.isEnabled()) {
-                continue;
-            }
-
-            long timeout = System.currentTimeMillis() + step.getTimeout();
-            step.enter();
-
-            telemetry.addData("STATE", step.getDescription());
-            telemetry.update();
-
-            while(step.isEnabled()
-                    && !step.isFinished()
-                    && opModeIsActive()
-                    && System.currentTimeMillis() < timeout) {
-                sleep(50);
-            }
-
-            step.leave();
-
-            if (!opModeIsActive()) {
-                break;
-            }
-        }
+        Steps stepsRunner = new Steps(steps, this);
+        stepsRunner.runStepsMap();
 
         // =========================================================================================
 

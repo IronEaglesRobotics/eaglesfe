@@ -28,32 +28,33 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
         final Robot             robot   =   new Robot(hardwareMap);
         robot.setVisionEnabled(true);
 
-        ArrayList<Step> steps = new ArrayList<>(Arrays.asList(
-                /* ============================================================================== */
+        ArrayList<Step> steps = new ArrayList<>();
+/*        ArrayList<Step> steps = new ArrayList<>(Arrays.asList(
+                *//* ============================================================================== *//*
                 new Step("Descending from lander...") {
                     public void enter() { robot.setLiftPosition(0.98, 1.0); }
                     public boolean isFinished() { return !robot.isLiftBusy(); }
                     public void leave() {}
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Scoot away from hook...", 1000) {
                     public void enter() { robot.moveForward(5.0, 0.3); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Quick scoot toward minerals...", 1000) {
                     public void enter() { robot.setDriveInput(-0.4, 0, 0);}
                     public boolean isFinished() { return false; }
                     public void leave() { robot.stopAllMotors(); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Pause until sample size is greater than 0...", 2000) {
                     public void enter() { robot.stopAllMotors(); }
                     public boolean isFinished() { return robot.getMineralSample().sampleSize > 0; }
                     public void leave() { robot.stopAllMotors(); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Strafe toward minerals...", 2500) {
                     public void enter() {
                         robot.useSideCamera();
@@ -88,13 +89,13 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
 
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Move to far right of minerals...") {
                     public void enter() { robot.moveForward(18, 0.4); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Scan for gold mineral...") {
                     public void enter() {
                         robot.useSideCamera();
@@ -116,29 +117,29 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
 
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Move back just a little bit...") {
                     public void enter() { robot.moveForward(2, 0.2); }
                     public boolean isFinished() { return !robot.isDriveBusy(); }
                     public void leave() { robot.stopAllMotors();}
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new SleepStep("Pause to let motion settle...", 250),
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Dislodge gold mineral...", 750) {
                     public void enter() { robot.setDriveInput(-0.5, 0, 0); }
                     public boolean isFinished() { return false; }
                     public void leave() { robot.setDriveInput(0, 0, 0); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new SleepStep("Pause to let motion settle...", 250),
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Return to previous position...", 750) {
                     public void enter () { robot.setDriveInput(0.5,0,0); }
                     public boolean isFinished() { return false; }
                     public void leave () { robot.setDriveInput(0,0,0); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Scan for vuforia targets...", 60000) {
 
                     public void enter () {
@@ -168,7 +169,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Move to wall...", 10000) {
 
                     private double distance = Double.MIN_VALUE;
@@ -199,7 +200,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Turn to face the depot...", 10000) {
 
                     public void enter() { robot.resetGyroHeading(); }
@@ -217,13 +218,13 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                         robot.stopAllMotors();
                     }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Strafe toward wall to square up...", 1000) {
                     public void enter() { robot.setDriveInput(0.4, 0, 0);}
                     public boolean isFinished() { return false; }
                     public void leave() { robot.stopAllMotors(); }
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("Sceedadle post haste to the depot...") {
                     public void enter() {
                         robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
@@ -232,7 +233,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                     public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
                     public void leave() { robot.stopAllMotors();}
                 },
-                /* ============================================================================== */
+                *//* ============================================================================== *//*
                 new Step("CRATER!!!") {
                     public void enter() {
                         robot.setArmPosition(0.25, 1.0);
@@ -245,7 +246,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
                     public void leave() { robot.stopAllMotors();}
                 }
         )
-        );
+        );*/
 
         // =========================================================================================
 
