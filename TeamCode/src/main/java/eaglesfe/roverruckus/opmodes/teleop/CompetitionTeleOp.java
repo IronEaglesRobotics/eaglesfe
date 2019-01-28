@@ -33,6 +33,8 @@ public class CompetitionTeleOp extends OpMode {
         float extendOut = gamepad2.right_trigger;
         float extendIn = gamepad2.left_trigger;
         float collectorUp = gamepad2.left_stick_y;
+        boolean fastFunction = gamepad1.right_bumper;
+
         if (gamepad2.b && !bPrev) {
             collectorLeft = !collectorLeft;
         }
@@ -43,7 +45,13 @@ public class CompetitionTeleOp extends OpMode {
         bPrev = gamepad2.b;
         xPrev = gamepad2.x;
 
-        robot.setDriveInput(x, y, z);
+
+        if (fastFunction){
+            robot.setDriveInput(x, y, z);
+        } else {
+            robot.setDriveInput(x / 2, y / 2, z / 2);
+        }
+
         robot.setExtendSpeed(extendOut - extendIn);
         robot.setArmSpeed(collectorUp);
         robot.setLiftSpeed(liftDown - liftUp);

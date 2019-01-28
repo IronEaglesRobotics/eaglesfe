@@ -23,6 +23,9 @@ import eaglesfe.roverruckus.opmodes.OpModeHelpers;
 @Autonomous(name="Autonomous Crater", group ="Competition")
 public class CompetitionAutonomousCrater extends LinearOpMode {
 
+    private Enum LastGoldPositionFromLander;
+    private Enum GoldPositionFromLander;
+
     @Override
     public void runOpMode() {
         final BirdseyeServer    server  =   new BirdseyeServer(3708, telemetry);
@@ -32,7 +35,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
         Map<String, Step> steps = new HashMap<>();
 
         steps.put("start", new Step("Descending from lander...") {
-            public void enter() { robot.setLiftPosition(1.0, 1.0); }
+            public void enter() { robot.setLiftPosition(0.95, 1.0); }
             public boolean isFinished() { return !robot.isLiftBusy(); }
             public String leave() { return "scoot_away_from_hook"; }
         });
@@ -46,101 +49,96 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
             }
         });
 
-        steps.put("scoot_toward_minerals", new Step("Quick scoot toward minerals...", 1000) {
-            public void enter() { robot.setDriveInput(-0.4, 0, 0);}
+        steps.put("scoot_toward_minerals", new Step("Quick scoot toward minerals...", 1300) {
+            public void enter() { robot.setDriveInput(-0.3, 0, 0);}
             public boolean isFinished() { return false; }
             public String leave() {
                 robot.stopAllMotors();
-                return "pause_for_sample";
+                return "Move_to_last_gold_position";
             }
         });
 
-        steps.put("pause_for_sample", new Step("Pause until sample size is greater than 0...", 2000) {
-            public void enter() { robot.stopAllMotors(); }
-            public boolean isFinished() { return robot.getMineralSample().sampleSize > 0; }
-            public String leave() {
-                robot.stopAllMotors();
-                return "strafe_toward_minerals";
-            }
-        });
-
-        steps.put("strafe_toward_minerals", new Step("Strafe toward minerals...", 2500) {
+        steps.put("Move_to_last_gold_position", new Step("Move to last gold position", 300) {
+            @Override
             public void enter() {
-                robot.useSideCamera();
-                robot.setDriveInput(-0.1, 0, 0);
+                robot.stopAllMotors();
             }
 
+            @Override
             public boolean isFinished() {
-                MineralSample sample = robot.getMineralSample();
-                float heading = robot.getGyroHeading180();
-
-                double x, z = 0;
-                if (heading >= 1) {
-                    z = 0.1;
-                } else if (heading <= -1) {
-                    z = -0.1;
-                }
-
-                if (sample.sampleSize > 0) {
-                    double center = sample.boundingBox.top + (sample.boundingBox.height() / 2);
-
-                    if (center < 10) {
-                        x = -0.1;
-                    } else if (center > 50) {
-                        x = 0.1;
-                    } else {
-                        return true;
-                    }
-                    robot.setDriveInput(x, 0, z);
-                }
                 return false;
             }
 
+            @Override
             public String leave() {
-                robot.setDriveInput(0, 0, 0);
-                return "move_to_right_of_minerals";
-            }
-        });
-
-        steps.put("move_to_right_of_minerals", new Step("Move to far right of minerals...") {
-            public void enter() { robot.moveForward(22, 0.4); }
-            public boolean isFinished() { return !robot.isDriveBusy(); }
-            public String leave() {
-                robot.setDriveInput(0, 0, 0);
-                return "scan_for_gold";
-            }
-        });
-
-        steps.put("scan_for_gold", new Step("Scan for gold mineral...") {
-            public void enter() {
-                robot.useSideCamera();
-                robot.setDriveInput(0, -0.1, 0);
-            }
-
-            public boolean isFinished() {
-                float heading = robot.getGyroHeading180();
-                if (heading >= 1) {
-                    robot.setDriveInputZ(0.1);
-                } else if (heading <= -1) {
-                    robot.setDriveInputZ(-0.1);
+                if (LastGoldPositionFromLander == MineralSample.GoldMineralArrangementFromLander.LEFT) {
+                    return "Move_to_left";
+                } else if (LastGoldPositionFromLander == MineralSample.GoldMineralArrangementFromLander.CENTER) {
+                    return "Move_to_center";
+                } else if (LastGoldPositionFromLander == MineralSample.GoldMineralArrangementFromLander.RIGHT) {
+                    return "Move_to_right";
                 } else {
-                    robot.setDriveInputZ(0);
+                    return "scan_for_vuforia_targets";
                 }
-
-                return robot.getMineralSample().goldSampleSize > 0;
-            }
-
-            public String leave() {
-                robot.setDriveInput(0, 0, 0);
-                return "sleep_to_settle_before_sample";
             }
         });
 
-        steps.put("sleep_to_settle_before_sample", new SleepStep("Pause to let motion settle...",
-                250, "dislodge_gold_mineral"));
+        steps.put("Move_to_left", new Step("move to left") {
+            @Override
+            public void enter() {
+                robot.moveBackward(8,.5);
+            }
 
-        steps.put("dislodge_gold_mineral", new Step("Dislodge gold mineral...", 750) {
-            public void enter() { robot.setDriveInput(-0.5, 0, 0); }
+            @Override
+            public boolean isFinished() {
+                return !robot.isDriveBusy();
+            }
+
+            @Override
+            public String leave() {
+                robot.stopAllMotors();
+                return "dislodge_gold_mineral";
+            }
+        });
+
+        steps.put("Move_to_center", new Step("move to center") {
+            @Override
+            public void enter() {
+                robot.moveForward(5,.5);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return !robot.isDriveBusy();
+            }
+
+            @Override
+            public String leave() {
+                robot.stopAllMotors();
+                return "dislodge_gold_mineral";
+            }
+        });
+
+        steps.put("Move_to_right", new Step("move to right") {
+            @Override
+            public void enter() {
+                robot.moveForward(20,.5);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return !robot.isDriveBusy();
+            }
+
+            @Override
+            public String leave() {
+                robot.stopAllMotors();
+                return "dislodge_gold_mineral";
+            }
+        });
+
+        steps.put("dislodge_gold_mineral", new Step("Dislodge gold mineral...", 900) {
+            public void enter() { robot.setDriveInput(-0.35, 0, 0); }
             public boolean isFinished() { return false; }
             public String leave() {
                 robot.setDriveInput(0, 0, 0);
@@ -151,8 +149,8 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
         steps.put("sleep_to_settle_after_sample", new SleepStep("Pause to let motion settle...",
                 250, "return_to_previous_position"));
 
-        steps.put("return_to_previous_position", new Step("Return to previous position...", 600) {
-            public void enter () { robot.setDriveInput(0.5,0,0); }
+        steps.put("return_to_previous_position", new Step("Return to previous position...", 900) {
+            public void enter () { robot.setDriveInput(0.35,0,0); }
             public boolean isFinished() { return false; }
             public String leave () {
                 robot.setDriveInput(0,0,0);
@@ -254,11 +252,28 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
         steps.put("skedaddle", new Step("Skedaddle post haste to the depot...") {
             public void enter() {
                 robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
-                robot.moveBackward(28, 0.6);
+                robot.moveBackward(30, 0.6);
             }
             public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
             public String leave() {
                 robot.stopAllMotors();
+                return "square_crater";
+            }
+        });
+
+        steps.put("square_crater", new Step("square to crater", 400) {
+            @Override
+            public void enter() {
+                robot.setDriveInput(-0.4, 0, 0);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return false;
+            }
+
+            @Override
+            public String leave() {
                 return "crater";
             }
         });
@@ -282,6 +297,21 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
 
         telemetry.addData("Ready...", null);
         telemetry.update();
+
+        while (!isStarted())  {
+            MineralSample sample = robot.getMineralSample();
+            telemetry.addData("Gold:", sample.goldMineralLocations);
+            telemetry.addData("Silver:", sample.silverMineralLocations);
+            telemetry.addData("Gold Mineral From Lander:", sample.goldMineralArrangementFromLander);
+            telemetry.addData("Last Position Of Gold Mineral From Lander:", LastGoldPositionFromLander);
+            telemetry.update();
+
+            if (sample.goldMineralArrangementFromLander != MineralSample.GoldMineralArrangementFromLander.UNKNOWN) {
+                LastGoldPositionFromLander = sample.goldMineralArrangementFromLander;
+            }
+
+            GoldPositionFromLander = sample.goldMineralArrangementFromLander;
+        }
 
         waitForStart();
 

@@ -242,11 +242,12 @@ public class Robot {
     // =============================================================================================
 
     public void setArmSpeed(double speed) {
-        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.collector.setPower(speed);
     }
 
     public void setArmPosition(double position, double speed) {
+        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         position = Range.clip(position, 0.0, 1.0);
         int ticks = (int)(position * Constants.MAX_ARM_TICKS);
         setMotorPosition(this.collector, ticks, speed);    }
