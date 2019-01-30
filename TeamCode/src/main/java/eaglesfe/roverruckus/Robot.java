@@ -70,12 +70,12 @@ public class Robot {
 
         this.collectorLeft = this.hardwareMap.servo.get(Constants.COLLECT_LEFT);
         this.collectorLeft.setDirection(Servo.Direction.REVERSE);
-        //this.collectorLeft.scaleRange(0, .75);
+        this.collectorLeft.scaleRange(0.125, 0.875);
         //this.collectorLeft.setPosition(1);
 
         this.collectorRight = this.hardwareMap.servo.get(Constants.COLLECT_RIGHT);
         this.collectorRight.setDirection(Servo.Direction.FORWARD);
-        //this.collectorRight.scaleRange(0, .75);
+        this.collectorRight.scaleRange(0.125, 0.875);
         //this.collectorRight.setPosition(1);
 
         this.imu = this.hardwareMap.get(BNO055IMU.class, Constants.GYRO);
@@ -282,8 +282,8 @@ public class Robot {
     // =============================================================================================
 
     public void collect(boolean left, boolean right) {
-        this.collectorLeft.setPosition(left ? 0.875 : 0.125);
-        this.collectorRight.setPosition(right ? 0.125 : 0.875);
+        this.collectorLeft.setPosition(left ? 0 : 1);
+        this.collectorRight.setPosition(right ? 0 : 1);
     }
 
     public double getCollectorLeftPosition(){
