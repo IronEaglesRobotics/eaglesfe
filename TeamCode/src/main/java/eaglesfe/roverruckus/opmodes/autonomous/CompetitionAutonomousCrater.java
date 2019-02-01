@@ -281,7 +281,7 @@ public class CompetitionAutonomousCrater extends LinearOpMode {
         steps.put("crater", new Step("CRATER!!!") {
             public void enter() {
                 robot.setArmPosition(0.25, 1.0);
-                robot.moveForward(50, 0.6);
+                robot.moveForward(60, 0.6);
                 robot.setExtedPosition(-4000, 1.0);
             }
             public boolean isFinished() { return !robot.isDriveBusy()

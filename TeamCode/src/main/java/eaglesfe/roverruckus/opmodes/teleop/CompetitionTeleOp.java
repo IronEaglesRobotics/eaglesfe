@@ -1,8 +1,7 @@
 package eaglesfe.roverruckus.opmodes.teleop;
-        import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-        import eaglesfe.roverruckus.Robot;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import eaglesfe.roverruckus.Robot;
 
 @TeleOp(name="TeleOp", group ="Competition")
 public class CompetitionTeleOp extends OpMode {
@@ -10,8 +9,10 @@ public class CompetitionTeleOp extends OpMode {
     Robot robot;
     private boolean bPrev;
     private boolean xPrev;
+    private boolean yPrev;
     private boolean collectorLeft;
     private boolean collectorRight;
+    private int armMAxEncoder;
 
     @Override
     public void init() {
@@ -38,13 +39,23 @@ public class CompetitionTeleOp extends OpMode {
         if (gamepad2.b && !bPrev) {
             collectorLeft = !collectorLeft;
         }
+
         if (gamepad2.x && !xPrev) {
             collectorRight = !collectorRight;
         }
 
+        if (gamepad2.y && !yPrev) {
+            robot.setArmPosition(1,1);
+        }
+
+        if (armMAxEncoder < robot.getArmPosition()) {
+            robot.reZeroArm();
+            armMAxEncoder = robot.getArmPosition();
+        }
+
         bPrev = gamepad2.b;
         xPrev = gamepad2.x;
-
+        yPrev = gamepad2.y;
 
         if (fastFunction){
             robot.setDriveInput(x, y, z);
@@ -53,7 +64,9 @@ public class CompetitionTeleOp extends OpMode {
         }
 
         robot.setExtendSpeed(extendOut - extendIn);
-        robot.setArmSpeed(collectorUp);
+        if (Math.abs(collectorUp) > .01 || !robot.isArmBusy()) {
+            robot.setArmSpeed(collectorUp);
+        }
         robot.setLiftSpeed(liftDown - liftUp);
         robot.collect(collectorLeft, collectorRight);
         telemetry.addData("Arm Position",robot.getArmPosition());

@@ -60,7 +60,7 @@ public class Robot {
         this.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.collector = this.hardwareMap.dcMotor.get(Constants.ARM);
-        this.collector.setDirection(FORWARD);
+        this.collector.setDirection(REVERSE);
         this.collector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.armMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
         this.collector.setMode(armMode);
@@ -252,18 +252,19 @@ public class Robot {
     // =============================================================================================
 
     public void setArmSpeed(double speed) {
-            if (liftMode != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-                liftMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-                this.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            if (this.armMode != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+                this.armMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+                this.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
         this.collector.setPower(speed);
     }
 
     public void setArmPosition(double position, double speed) {
-        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         position = Range.clip(position, 0.0, 1.0);
         int ticks = (int)(position * Constants.MAX_ARM_TICKS);
-        setMotorPosition(this.collector, ticks, speed);    }
+        setMotorPosition(this.collector, ticks, speed);
+        this.armMode = DcMotor.RunMode.RUN_TO_POSITION;
+    }
 
     public int getArmPosition() {
         return collector.getCurrentPosition();
@@ -271,6 +272,11 @@ public class Robot {
 
     public boolean isArmBusy() {
         return collector.isBusy();
+    }
+
+    public void reZeroArm() {
+        this.collector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     private DcMotor.RunMode armMode;
@@ -335,7 +341,7 @@ public class Robot {
         public static final int CAM_R_OFFSET       = 180;
 
         public static final int MAX_LIFT_TICKS     = 3100;
-        public static final int MAX_ARM_TICKS      = -4500;
+        public static final int MAX_ARM_TICKS      = -4250;
         public static final double TEAM_MARKER_DEPLOY = -2500f / MAX_ARM_TICKS;
     }
 }
