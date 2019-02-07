@@ -48,9 +48,13 @@ public class CompetitionTeleOp extends OpMode {
             robot.setArmPosition(1,1);
         }
 
-        if (armMAxEncoder < robot.getArmPosition()) {
+        if (armMAxEncoder < robot.getArmPosition() - 1000) {
             robot.reZeroArm();
             armMAxEncoder = robot.getArmPosition();
+        }
+
+        if (gamepad2.left_bumper) {
+            robot.reZeroArm();
         }
 
         bPrev = gamepad2.b;
@@ -64,6 +68,7 @@ public class CompetitionTeleOp extends OpMode {
         }
 
         robot.setExtendSpeed(extendOut - extendIn);
+
         if (Math.abs(collectorUp) > .01 || !robot.isArmBusy()) {
             robot.setArmSpeed(collectorUp);
         }

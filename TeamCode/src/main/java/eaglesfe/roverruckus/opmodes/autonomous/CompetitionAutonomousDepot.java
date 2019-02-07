@@ -23,6 +23,7 @@ import eaglesfe.roverruckus.Robot;
 import eaglesfe.roverruckus.opmodes.OpModeHelpers;
 
 @Autonomous(name="Autonomous Depot", group ="Competition")
+
 public class CompetitionAutonomousDepot extends LinearOpMode {
 
     private Enum LastGoldPositionFromLander;
@@ -160,7 +161,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
             }
         });
 
-        steps.put("scan_for_vuforia_targets", new Step("Scan for vuforia targets...", 60000) {
+        steps.put("scan_for_vuforia_targets", new Step("Scan for vuforia targets...", 6000) {
 
             public void enter () {
                 robot.useRearCamera();
