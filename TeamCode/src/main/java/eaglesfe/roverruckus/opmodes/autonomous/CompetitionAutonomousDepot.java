@@ -125,7 +125,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
         steps.put("Move_to_right", new Step("move to right") {
             @Override
             public void enter() {
-                robot.moveForward(8,.5);
+                robot.moveForward(12,.5);
             }
 
             @Override
@@ -140,7 +140,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
             }
         });
 
-        steps.put("dislodge_gold_mineral", new Step("Dislodge gold mineral...", 900) {
+        steps.put("dislodge_gold_mineral", new Step("Dislodge gold mineral...", 1300) {
             public void enter() { robot.setDriveInput(-0.35, 0, 0); }
             public boolean isFinished() { return false; }
             public String leave() {
@@ -152,7 +152,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
         steps.put("sleep_to_settle_after_sample", new SleepStep("Pause to let motion settle...",
                 250, "return_to_previous_position"));
 
-        steps.put("return_to_previous_position", new Step("Return to previous position...", 900) {
+        steps.put("return_to_previous_position", new Step("Return to previous position...", 1100) {
             public void enter () { robot.setDriveInput(0.35,0,0); }
             public boolean isFinished() { return false; }
             public String leave () {
@@ -255,7 +255,7 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
         steps.put("skedaddle", new Step("Skedaddle post haste to the depot...") {
             public void enter() {
                 robot.setArmPosition(Robot.Constants.TEAM_MARKER_DEPLOY, 1.0);
-                robot.moveBackward(48, 0.6);
+                robot.moveBackward(50, 0.6);
             }
             public boolean isFinished() { return !robot.isDriveBusy() && !robot.isArmBusy(); }
             public String leave() {
@@ -277,15 +277,16 @@ public class CompetitionAutonomousDepot extends LinearOpMode {
 
             @Override
             public String leave() {
+                robot.stopAllMotors();
                 return "crater";
             }
         });
 
         steps.put("crater", new Step("CRATER!!!") {
             public void enter() {
-                robot.setArmPosition(0.25, 1.0);
-                robot.moveForward(60, 0.6);
-                robot.setExtedPosition(-4000, 1.0);
+                robot.setArmPosition(0.20, 1.0);
+                robot.moveForward(58, 0.6);
+                robot.setExtedPosition(-4500, 1.0);
             }
             public boolean isFinished() { return !robot.isDriveBusy()
                     && !robot.isArmBusy()

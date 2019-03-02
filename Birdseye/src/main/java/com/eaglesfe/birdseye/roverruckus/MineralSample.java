@@ -92,12 +92,22 @@ public class MineralSample {
     private GoldMineralArrangementFromLander getGoldMineralArrangementFromLander() {
         if (sampleSize == 2) {
             if (goldSampleSize == 1 && silverSampleSize == 1) {
-                if (goldMineralLocations.get(0).x > 55) {
+                if (goldMineralLocations.get(0).x > silverMineralLocations.get(0).x) {
                     return  GoldMineralArrangementFromLander.RIGHT;
                 } else {
                     return  GoldMineralArrangementFromLander.CENTER;
                 }
             } else if (silverSampleSize == 2) {
+                return GoldMineralArrangementFromLander.LEFT;
+            }
+        } else if (goldSampleSize == 1 && silverSampleSize == 2) {
+            if (goldMineralLocations.get(0).x > silverMineralLocations.get(0).x && goldMineralLocations.get(0).x > silverMineralLocations.get(1).x) {
+                return GoldMineralArrangementFromLander.RIGHT;
+            } else if ( goldMineralLocations.get(0).x > silverMineralLocations.get(0).x && goldMineralLocations.get(0).x < silverMineralLocations.get(1).x ||
+                    goldMineralLocations.get(0).x < silverMineralLocations.get(0).x && goldMineralLocations.get(0).x > silverMineralLocations.get(1).x
+                    ) {
+                return  GoldMineralArrangementFromLander.CENTER;
+            } else if (goldMineralLocations.get(0).x < silverMineralLocations.get(0).x && goldMineralLocations.get(0).x < silverMineralLocations.get(1).x) {
                 return GoldMineralArrangementFromLander.LEFT;
             }
         }

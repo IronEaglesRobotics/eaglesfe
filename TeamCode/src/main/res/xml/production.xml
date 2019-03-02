@@ -19,7 +19,7 @@
 
             <!-- Collector -->
             <NeveRest20Gearmotor name="Extend" port="2" />
-            <NeveRest3.7v1Gearmotor name="Arm" port="3" />
+            <NeveRest20Gearmotor name="Arm" port="3" />
             <Servo name="CollectorLeft" port="0" />
             <Servo name="CollectorRight" port="1" />
         </LynxModule>
