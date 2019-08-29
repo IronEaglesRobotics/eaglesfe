@@ -55,27 +55,32 @@ public class Robot {
         this.lift = this.hardwareMap.dcMotor.get(Constants.LIFT);
         this.lift.setDirection(FORWARD);
         this.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        this.liftMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+        this.lift.setMode(this.liftMode);
         this.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.collector = this.hardwareMap.dcMotor.get(Constants.ARM);
-        this.collector.setDirection(FORWARD);
-        this.collector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        this.collector.setDirection(REVERSE);
+        this.collector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.armMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+        this.collector.setMode(armMode);
         this.collector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.extend = this.hardwareMap.dcMotor.get(Constants.EXTEND);
         this.extend.setDirection(FORWARD);
-        this.extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.extendMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+        this.extend.setMode(extendMode);
         this.extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.collectorLeft = this.hardwareMap.servo.get(Constants.COLLECT_LEFT);
         this.collectorLeft.setDirection(Servo.Direction.REVERSE);
-        this.collectorLeft.scaleRange(0, .75);
+        this.collectorLeft.scaleRange(0.02, 0.65);
         //this.collectorLeft.setPosition(1);
 
         this.collectorRight = this.hardwareMap.servo.get(Constants.COLLECT_RIGHT);
         this.collectorRight.setDirection(Servo.Direction.FORWARD);
-        this.collectorRight.scaleRange(0, .75);
+        this.collectorRight.scaleRange(0.15, 0.73);
         //this.collectorRight.setPosition(1);
 
         this.imu = this.hardwareMap.get(BNO055IMU.class, Constants.GYRO);
@@ -221,7 +226,10 @@ public class Robot {
 
     // =============================================================================================
     public void setLiftSpeed(double speed) {
-        this.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (liftMode != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            liftMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+            this.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
         this.lift.setPower(speed);
     }
 
@@ -239,17 +247,24 @@ public class Robot {
         return lift.isBusy();
     }
 
+    private DcMotor.RunMode liftMode;
+
     // =============================================================================================
 
     public void setArmSpeed(double speed) {
-        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if (this.armMode != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+                this.armMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+                this.collector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
         this.collector.setPower(speed);
     }
 
     public void setArmPosition(double position, double speed) {
         position = Range.clip(position, 0.0, 1.0);
         int ticks = (int)(position * Constants.MAX_ARM_TICKS);
-        setMotorPosition(this.collector, ticks, speed);    }
+        setMotorPosition(this.collector, ticks, speed);
+        this.armMode = DcMotor.RunMode.RUN_TO_POSITION;
+    }
 
     public int getArmPosition() {
         return collector.getCurrentPosition();
@@ -259,10 +274,20 @@ public class Robot {
         return collector.isBusy();
     }
 
+    public void reZeroArm() {
+        this.collector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private DcMotor.RunMode armMode;
     // =============================================================================================
 
     public void setExtendSpeed(double speed) {
-        this.extend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (extendMode != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            extendMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+            this.extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        this.extend.setPower(speed);
         setMotorSpeed(this.extend, speed);
     }
 
@@ -278,11 +303,12 @@ public class Robot {
         return extend.isBusy();
     }
 
+    private DcMotor.RunMode extendMode;
     // =============================================================================================
 
     public void collect(boolean left, boolean right) {
-        this.collectorLeft.setPosition(left ? 0 : 1);
-        this.collectorRight.setPosition(right ? 0 : 1);
+        this.collectorLeft.setPosition(left ? 1 : 0);
+        this.collectorRight.setPosition(right ? 1 : 0);
     }
 
     public double getCollectorLeftPosition(){
@@ -315,7 +341,7 @@ public class Robot {
         public static final int CAM_R_OFFSET       = 180;
 
         public static final int MAX_LIFT_TICKS     = 3100;
-        public static final int MAX_ARM_TICKS      = -4500;
+        public static final int MAX_ARM_TICKS      = -4250;
         public static final double TEAM_MARKER_DEPLOY = -2500f / MAX_ARM_TICKS;
     }
 }
